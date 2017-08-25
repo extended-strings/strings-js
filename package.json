@@ -1,5 +1,5 @@
 {
-  "name": "strings",
+  "name": "harmonic-strings",
   "version": "0.0.1",
   "description": "Calculates string lengths, frequencies, intervals, harmonics, etc.",
   "main": "lib/strings.js",
