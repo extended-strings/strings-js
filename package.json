@@ -1,8 +1,8 @@
 {
   "name": "harmonic-strings",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Calculates string lengths, frequencies, intervals, harmonics, etc.",
-  "main": "lib/strings.js",
+  "main": "dist/strings.js",
   "scripts": {
     "build": "webpack",
     "dev": "webpack --progress --colors --watch",
