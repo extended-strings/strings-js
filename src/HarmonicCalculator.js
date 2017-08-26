@@ -1,5 +1,6 @@
 import Cents from './Cents';
-import { Harmonic } from './index';
+import Harmonic from './Harmonic';
+import Math from './Math';
 
 function getPhysicalDistanceBetweenStops(harmonic, instrument) {
   return (harmonic.baseStop - harmonic.halfStop) * instrument.stringLength;
@@ -12,10 +13,10 @@ function getBowedDistance(harmonic, instrument) {
 export default class HarmonicCalculator {
 
   constructor({
-                minStopDistance = 1.0,
-                maxStopDistance = 120.0,
-                minBowedDistance = 20.0,
-                maxSoundingNoteDifference = 50.0
+                minStopDistance = 1,
+                maxStopDistance = 120,
+                minBowedDistance = 20,
+                maxSoundingNoteDifference = 50
   } = {}) {
     this.minStopDistance = minStopDistance;
     this.maxStopDistance = maxStopDistance;
@@ -28,10 +29,9 @@ export default class HarmonicCalculator {
     const soundingNoteFrequency = soundingNote.getFrequency();
     for (let number = 6; number >= 2; number--) {
       const fundamental = soundingNoteFrequency / number;
-      if (fundamental > stringFrequency) {
+      if (Math.isGreaterThan(fundamental, stringFrequency)) {
         const baseStop = Cents.frequencyToStringLength(fundamental, stringFrequency),
-          ratio = (number - 1) / number,
-          halfStop = ratio * baseStop;
+          halfStop = (number - 1) / number * baseStop;
 
         harmonics.push(new Harmonic(halfStop, baseStop, stringFrequency));
       }

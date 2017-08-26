@@ -86,13 +86,13 @@ export default class Note {
 
     this.name = name;
     this.accidental = accidental;
-    this.octave = parseInt(octave, 10);
-    this.difference = parseFloat(difference);
+    this.octave = octave;
+    this.difference = difference;
   }
 
   static fromCents(cents, preferredAccidentals = []) {
-    const rounded = parseInt(Math.round(cents / 50) * 50, 10),
-      difference = cents - rounded,
+    const rounded = Math.round(cents / 50) * 50,
+      difference = Math.round((cents - rounded) * 100) / 100,
       octave = Math.floor(rounded / 1200) + 4,
       centsWithoutOctave = rounded - ((octave - 4) * 1200),
       names = Object.keys(nameCents);
@@ -108,7 +108,7 @@ export default class Note {
     throw new Error(`Failed to find note name for cents: ${cents}`);
   }
 
-  static fromFrequency(frequency, a4 = 440.0, preferredAccidentals = []) {
+  static fromFrequency(frequency, a4 = 440, preferredAccidentals = []) {
     return Note.fromCents(Cents.frequencyToCents(frequency, a4), preferredAccidentals);
   }
 
@@ -123,11 +123,9 @@ export default class Note {
     if (rest.match(/^\-[0-9]+$/i)) {
       throw new Error(`Ambiguous note: ${name} (does "-" mean a quarter-flat or a negative?)`);
     }
-    matches = rest.match(new RegExp('\/?(\-?[0-9]+)?( ([\+-][0-9]+)[c¢])?$', 'iu'));
-    const {
-      1: octave = 4,
-      3: difference = 0
-    } = matches;
+    matches = rest.match(new RegExp('\/? *(\-?[0-9]+)?( +([\+-][0-9]+(\.[0-9]+)?) *[c¢])?$', 'iu'));
+    const octave = matches[1] !== undefined ? parseInt(matches[1], 10) : 4;
+    const difference = matches[3] !== undefined ? Math.round(matches[3] * 100) / 100 : 0;
     rest = rest.substr(0, rest.length - matches[0].length);
     const accidental = normalizeAccidental(rest);
 
@@ -136,9 +134,8 @@ export default class Note {
 
   toString() {
     let output = this.name + this.accidental + this.octave;
-    const differenceRounded = Math.round(this.difference);
-    if (differenceRounded !== 0) {
-      output += ' ' + (differenceRounded > 0 ? '+' : '') + Math.round(this.difference) + '¢';
+    if (!Math.isEqual(this.difference, 0)) {
+      output += ' ' + (this.difference > 0 ? '+' : '') + this.difference + '¢';
     }
 
     return output;
@@ -151,7 +148,7 @@ export default class Note {
       this.difference;
   }
 
-  getFrequency(a4 = 440.0) {
+  getFrequency(a4 = 440) {
     return Cents.centsToFrequency(this.cents - 900, a4);
   }
 

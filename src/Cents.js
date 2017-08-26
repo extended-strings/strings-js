@@ -1,9 +1,9 @@
 export default class Cents {
   static frequenciesToCents(lower, upper) {
-    return lower === 0 ? 0 : 1200 * (Math.log(upper / lower) / Math.log(2));
+    return Math.isEqual(lower, 0) ? 0 : 1200 * (Math.log(upper / lower) / Math.log(2));
   }
 
-  static frequencyToCents(frequency, a4 = 440.0) {
+  static frequencyToCents(frequency, a4 = 440) {
     return Cents.frequenciesToCents(a4, frequency) + 900;
   }
 
@@ -16,7 +16,7 @@ export default class Cents {
   }
 
   static frequencyToStringLength(frequency, stringFrequency) {
-    if (frequency === 0) {
+    if (Math.isEqual(frequency, 0)) {
       throw new Error(`Invalid frequency: ${frequency}`);
     }
     const centsOverString = this.frequenciesToCents(stringFrequency, frequency);

@@ -96,12 +96,12 @@ var Cents = function () {
   _createClass(Cents, null, [{
     key: "frequenciesToCents",
     value: function frequenciesToCents(lower, upper) {
-      return lower === 0 ? 0 : 1200 * (Math.log(upper / lower) / Math.log(2));
+      return Math.isEqual(lower, 0) ? 0 : 1200 * (Math.log(upper / lower) / Math.log(2));
     }
   }, {
     key: "frequencyToCents",
     value: function frequencyToCents(frequency) {
-      var a4 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 440.0;
+      var a4 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 440;
 
       return Cents.frequenciesToCents(a4, frequency) + 900;
     }
@@ -118,7 +118,7 @@ var Cents = function () {
   }, {
     key: "frequencyToStringLength",
     value: function frequencyToStringLength(frequency, stringFrequency) {
-      if (frequency === 0) {
+      if (Math.isEqual(frequency, 0)) {
         throw new Error("Invalid frequency: " + frequency);
       }
       var centsOverString = this.frequenciesToCents(stringFrequency, frequency);
@@ -158,7 +158,7 @@ var _Instrument = __webpack_require__(5);
 
 var _Instrument2 = _interopRequireDefault(_Instrument);
 
-var _Note = __webpack_require__(3);
+var _Note = __webpack_require__(6);
 
 var _Note2 = _interopRequireDefault(_Note);
 
@@ -186,13 +186,13 @@ var _Cents = __webpack_require__(0);
 
 var _Cents2 = _interopRequireDefault(_Cents);
 
+var _Math = __webpack_require__(3);
+
+var _Math2 = _interopRequireDefault(_Math);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function gcd(a, b) {
-  return b === 0 ? a : gcd(b, a % b);
-}
 
 var Harmonic = function () {
   function Harmonic(halfStop, baseStop, stringFrequency) {
@@ -202,15 +202,15 @@ var Harmonic = function () {
       throw new Error('The half-stop cannot be lower than the base stop.');
     }
 
-    this.halfStop = parseFloat(halfStop);
-    this.baseStop = parseFloat(baseStop);
+    this.halfStop = halfStop;
+    this.baseStop = baseStop;
     this.stringFrequency = stringFrequency;
   }
 
   _createClass(Harmonic, [{
     key: 'number',
     get: function get() {
-      var number = Math.round(1 / gcd(1, this.halfStop / this.baseStop));
+      var number = _Math2.default.round(1 / _Math2.default.gcd(1, this.halfStop / this.baseStop));
       Object.defineProperty(this, 'number', { value: number, writable: false });
 
       return number;
@@ -218,12 +218,15 @@ var Harmonic = function () {
   }, {
     key: 'isNatural',
     get: function get() {
-      return this.baseStop === 1.0;
+      return _Math2.default.isEqual(this.baseStop, 1);
     }
   }, {
     key: 'frequency',
     get: function get() {
-      return Harmonic.getSoundingFrequency(this.number, this.baseStop, this.stringFrequency);
+      var frequency = Harmonic.getSoundingFrequency(this.number, this.baseStop, this.stringFrequency);
+      Object.defineProperty(this, 'frequency', { value: frequency, writable: false });
+
+      return frequency;
     }
   }], [{
     key: 'getSoundingFrequency',
@@ -239,7 +242,7 @@ var Harmonic = function () {
 
       var harmonics = [];
       for (var numerator = 1; numerator <= number; numerator++) {
-        if (!exclusive || numerator === 1 || gcd(numerator, number) === 1) {
+        if (!exclusive || numerator === 1 || _Math2.default.isEqual(_Math2.default.gcd(numerator, number), 1)) {
           harmonics.push(numerator / number);
         }
       }
@@ -275,184 +278,22 @@ module.exports = exports['default'];
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+var EPSILON = Math.pow(2, -32);
 
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _ACCIDENTAL_PATTERNS, _accidentalCents;
-
-var _Cents = __webpack_require__(0);
-
-var _Cents2 = _interopRequireDefault(_Cents);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
-var ACCIDENTAL_NATURAL = '';
-var ACCIDENTAL_SHARP = '♯';
-var ACCIDENTAL_FLAT = '♭';
-var ACCIDENTAL_DOUBLE_SHARP = 'x';
-var ACCIDENTAL_DOUBLE_FLAT = '♭♭';
-var ACCIDENTAL_QUARTER_SHARP = '¼♯';
-var ACCIDENTAL_QUARTER_FLAT = '¼♭';
-var ACCIDENTAL_THREE_QUARTER_SHARP = '¾♯';
-var ACCIDENTAL_THREE_QUARTER_FLAT = '¾♭';
-
-var PATTERN_ACCIDENTAL_SHARP = '([♯s#]|sharp)';
-var PATTERN_ACCIDENTAL_FLAT = '([♭fb]|flat)';
-var PATTERN_ACCIDENTAL_QUARTER = '(quarter|¼|1/4)[ -]?';
-var PATTERN_ACCIDENTAL_3_QUARTER = '((three|3)[ -]quarter|¾|3/4)[ -]?';
-
-var ACCIDENTAL_PATTERNS = (_ACCIDENTAL_PATTERNS = {}, _defineProperty(_ACCIDENTAL_PATTERNS, '', ACCIDENTAL_NATURAL), _defineProperty(_ACCIDENTAL_PATTERNS, PATTERN_ACCIDENTAL_FLAT, ACCIDENTAL_FLAT), _defineProperty(_ACCIDENTAL_PATTERNS, PATTERN_ACCIDENTAL_SHARP, ACCIDENTAL_SHARP), _defineProperty(_ACCIDENTAL_PATTERNS, '(-|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTAL_QUARTER_FLAT), _defineProperty(_ACCIDENTAL_PATTERNS, '(\\+|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTAL_QUARTER_SHARP), _defineProperty(_ACCIDENTAL_PATTERNS, '(𝄫|bb|double[ -]' + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTAL_DOUBLE_FLAT), _defineProperty(_ACCIDENTAL_PATTERNS, '(𝄪|♯♯|##|double[ -]' + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTAL_DOUBLE_SHARP), _defineProperty(_ACCIDENTAL_PATTERNS, '(' + PATTERN_ACCIDENTAL_FLAT + '-|' + PATTERN_ACCIDENTAL_3_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTAL_THREE_QUARTER_FLAT), _defineProperty(_ACCIDENTAL_PATTERNS, '(' + PATTERN_ACCIDENTAL_SHARP + '\\+|' + PATTERN_ACCIDENTAL_3_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTAL_THREE_QUARTER_SHARP), _ACCIDENTAL_PATTERNS);
-
-var normalizeAccidental = function normalizeAccidental(accidental) {
-  accidental = accidental.trim();
-
-  for (var pattern in ACCIDENTAL_PATTERNS) {
-    var replacement = ACCIDENTAL_PATTERNS[pattern];
-    if (accidental === replacement || new RegExp('^' + pattern + '$', 'iu').test(accidental)) {
-      return replacement;
-    }
-  }
-
-  throw new Error('Invalid accidental: ' + accidental);
+Math.isEqual = function (a, b) {
+  return Math.abs(a - b) < EPSILON;
 };
 
-var accidentalCents = (_accidentalCents = {}, _defineProperty(_accidentalCents, ACCIDENTAL_NATURAL, 0), _defineProperty(_accidentalCents, ACCIDENTAL_FLAT, -100), _defineProperty(_accidentalCents, ACCIDENTAL_SHARP, -100), _defineProperty(_accidentalCents, ACCIDENTAL_QUARTER_FLAT, -50), _defineProperty(_accidentalCents, ACCIDENTAL_QUARTER_SHARP, 50), _defineProperty(_accidentalCents, ACCIDENTAL_DOUBLE_FLAT, -200), _defineProperty(_accidentalCents, ACCIDENTAL_DOUBLE_SHARP, 200), _defineProperty(_accidentalCents, ACCIDENTAL_THREE_QUARTER_FLAT, -150), _defineProperty(_accidentalCents, ACCIDENTAL_THREE_QUARTER_SHARP, 150), _accidentalCents);
-
-var nameCents = {
-  'C': 0,
-  'D': 200,
-  'E': 400,
-  'F': 500,
-  'G': 700,
-  'A': 900,
-  'B': 1100
+Math.isGreaterThan = function (a, b) {
+  return a > b && a - b > EPSILON;
 };
 
-var defaultPreferredAccidentals = [ACCIDENTAL_NATURAL, ACCIDENTAL_SHARP, ACCIDENTAL_FLAT, ACCIDENTAL_QUARTER_SHARP, ACCIDENTAL_QUARTER_FLAT, ACCIDENTAL_DOUBLE_SHARP, ACCIDENTAL_DOUBLE_FLAT, ACCIDENTAL_THREE_QUARTER_FLAT, ACCIDENTAL_THREE_QUARTER_SHARP];
+Math.gcd = function (a, b) {
+  return this.isEqual(b, 0) ? a : this.gcd(b, a % b);
+};
 
-var Note = function () {
-  function Note(name) {
-    var accidental = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-    var octave = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 4;
-    var difference = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
-
-    _classCallCheck(this, Note);
-
-    if (octave > 1000) {
-      throw new Error('Invalid octave: ' + octave);
-    }
-
-    this.name = name;
-    this.accidental = accidental;
-    this.octave = parseInt(octave, 10);
-    this.difference = parseFloat(difference);
-  }
-
-  _createClass(Note, [{
-    key: 'toString',
-    value: function toString() {
-      var output = this.name + this.accidental + this.octave;
-      var differenceRounded = Math.round(this.difference);
-      if (differenceRounded !== 0) {
-        output += ' ' + (differenceRounded > 0 ? '+' : '') + Math.round(this.difference) + '¢';
-      }
-
-      return output;
-    }
-  }, {
-    key: 'getFrequency',
-    value: function getFrequency() {
-      var a4 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 440.0;
-
-      return _Cents2.default.centsToFrequency(this.cents - 900, a4);
-    }
-  }, {
-    key: 'cents',
-    get: function get() {
-      return nameCents[this.name] + accidentalCents[this.accidental] + (this.octave - 4) * 1200 + this.difference;
-    }
-  }], [{
-    key: 'fromCents',
-    value: function fromCents(cents) {
-      var preferredAccidentals = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
-
-      var rounded = parseInt(Math.round(cents / 50) * 50, 10),
-          difference = cents - rounded,
-          octave = Math.floor(rounded / 1200) + 4,
-          centsWithoutOctave = rounded - (octave - 4) * 1200,
-          names = Object.keys(nameCents);
-
-      var _arr = [].concat(_toConsumableArray(preferredAccidentals), defaultPreferredAccidentals);
-
-      var _loop = function _loop() {
-        var accidental = _arr[_i];
-        var cents = centsWithoutOctave - accidentalCents[accidental],
-            noteName = names.find(function (key) {
-          return nameCents[key] === cents;
-        });
-        if (noteName !== undefined) {
-          return {
-            v: new Note(noteName, accidental, octave, difference)
-          };
-        }
-      };
-
-      for (var _i = 0; _i < _arr.length; _i++) {
-        var _ret = _loop();
-
-        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-      }
-
-      throw new Error('Failed to find note name for cents: ' + cents);
-    }
-  }, {
-    key: 'fromFrequency',
-    value: function fromFrequency(frequency) {
-      var a4 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 440.0;
-      var preferredAccidentals = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
-
-      return Note.fromCents(_Cents2.default.frequencyToCents(frequency, a4), preferredAccidentals);
-    }
-  }, {
-    key: 'fromName',
-    value: function fromName(name) {
-      var rest = name;
-      var matches = rest.match(/^[a-g]/i);
-      if (matches === null) {
-        throw new Error('Invalid note name: ' + name);
-      }
-      var noteName = matches[0].toUpperCase();
-      rest = name.substr(matches[0].length);
-      if (rest.match(/^\-[0-9]+$/i)) {
-        throw new Error('Ambiguous note: ' + name + ' (does "-" mean a quarter-flat or a negative?)');
-      }
-      matches = rest.match(new RegExp('\/?(\-?[0-9]+)?( ([\+-][0-9]+)[c¢])?$', 'iu'));
-      var _matches = matches,
-          _matches$ = _matches[1],
-          octave = _matches$ === undefined ? 4 : _matches$,
-          _matches$2 = _matches[3],
-          difference = _matches$2 === undefined ? 0 : _matches$2;
-
-      rest = rest.substr(0, rest.length - matches[0].length);
-      var accidental = normalizeAccidental(rest);
-
-      return new Note(noteName, accidental, octave, difference);
-    }
-  }]);
-
-  return Note;
-}();
-
-exports.default = Note;
-module.exports = exports['default'];
+exports.default = Math;
+module.exports = exports["default"];
 
 /***/ }),
 /* 4 */
@@ -471,7 +312,13 @@ var _Cents = __webpack_require__(0);
 
 var _Cents2 = _interopRequireDefault(_Cents);
 
-var _index = __webpack_require__(1);
+var _Harmonic = __webpack_require__(2);
+
+var _Harmonic2 = _interopRequireDefault(_Harmonic);
+
+var _Math = __webpack_require__(3);
+
+var _Math2 = _interopRequireDefault(_Math);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -491,13 +338,13 @@ var HarmonicCalculator = function () {
   function HarmonicCalculator() {
     var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
         _ref$minStopDistance = _ref.minStopDistance,
-        minStopDistance = _ref$minStopDistance === undefined ? 1.0 : _ref$minStopDistance,
+        minStopDistance = _ref$minStopDistance === undefined ? 1 : _ref$minStopDistance,
         _ref$maxStopDistance = _ref.maxStopDistance,
-        maxStopDistance = _ref$maxStopDistance === undefined ? 120.0 : _ref$maxStopDistance,
+        maxStopDistance = _ref$maxStopDistance === undefined ? 120 : _ref$maxStopDistance,
         _ref$minBowedDistance = _ref.minBowedDistance,
-        minBowedDistance = _ref$minBowedDistance === undefined ? 20.0 : _ref$minBowedDistance,
+        minBowedDistance = _ref$minBowedDistance === undefined ? 20 : _ref$minBowedDistance,
         _ref$maxSoundingNoteD = _ref.maxSoundingNoteDifference,
-        maxSoundingNoteDifference = _ref$maxSoundingNoteD === undefined ? 50.0 : _ref$maxSoundingNoteD;
+        maxSoundingNoteDifference = _ref$maxSoundingNoteD === undefined ? 50 : _ref$maxSoundingNoteD;
 
     _classCallCheck(this, HarmonicCalculator);
 
@@ -514,12 +361,11 @@ var HarmonicCalculator = function () {
       var soundingNoteFrequency = soundingNote.getFrequency();
       for (var number = 6; number >= 2; number--) {
         var fundamental = soundingNoteFrequency / number;
-        if (fundamental > stringFrequency) {
+        if (_Math2.default.isGreaterThan(fundamental, stringFrequency)) {
           var baseStop = _Cents2.default.frequencyToStringLength(fundamental, stringFrequency),
-              ratio = (number - 1) / number,
-              halfStop = ratio * baseStop;
+              halfStop = (number - 1) / number * baseStop;
 
-          harmonics.push(new _index.Harmonic(halfStop, baseStop, stringFrequency));
+          harmonics.push(new _Harmonic2.default(halfStop, baseStop, stringFrequency));
         }
       }
 
@@ -531,11 +377,11 @@ var HarmonicCalculator = function () {
       var harmonics = [];
       for (var number = 1; number <= 8; number++) {
         // Convert harmonic number to the sounding frequency.
-        var candidateFrequency = _index.Harmonic.getSoundingFrequency(1, 1 / number, stringFrequency);
+        var candidateFrequency = _Harmonic2.default.getSoundingFrequency(1, 1 / number, stringFrequency);
 
         // Calculate the difference in cents between the natural harmonic
         // frequency and the desired sounding note.
-        var difference = Math.abs(_Cents2.default.frequencyToCents(candidateFrequency) - soundingNote.cents);
+        var difference = _Math2.default.abs(_Cents2.default.frequencyToCents(candidateFrequency) - soundingNote.cents);
 
         if (difference <= this.maxSoundingNoteDifference) {
           var _iteratorNormalCompletion = true;
@@ -543,10 +389,10 @@ var HarmonicCalculator = function () {
           var _iteratorError = undefined;
 
           try {
-            for (var _iterator = _index.Harmonic.getStringLengthsFromNumber(number, true)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            for (var _iterator = _Harmonic2.default.getStringLengthsFromNumber(number, true)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
               var stringLength = _step.value;
 
-              harmonics.push(new _index.Harmonic(stringLength, 1, stringFrequency));
+              harmonics.push(new _Harmonic2.default(stringLength, 1, stringFrequency));
             }
           } catch (err) {
             _didIteratorError = true;
@@ -723,6 +569,190 @@ var Instrument = function () {
 }();
 
 exports.default = Instrument;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _ACCIDENTAL_PATTERNS, _accidentalCents;
+
+var _Cents = __webpack_require__(0);
+
+var _Cents2 = _interopRequireDefault(_Cents);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var ACCIDENTAL_NATURAL = '';
+var ACCIDENTAL_SHARP = '♯';
+var ACCIDENTAL_FLAT = '♭';
+var ACCIDENTAL_DOUBLE_SHARP = 'x';
+var ACCIDENTAL_DOUBLE_FLAT = '♭♭';
+var ACCIDENTAL_QUARTER_SHARP = '¼♯';
+var ACCIDENTAL_QUARTER_FLAT = '¼♭';
+var ACCIDENTAL_THREE_QUARTER_SHARP = '¾♯';
+var ACCIDENTAL_THREE_QUARTER_FLAT = '¾♭';
+
+var PATTERN_ACCIDENTAL_SHARP = '([♯s#]|sharp)';
+var PATTERN_ACCIDENTAL_FLAT = '([♭fb]|flat)';
+var PATTERN_ACCIDENTAL_QUARTER = '(quarter|¼|1/4)[ -]?';
+var PATTERN_ACCIDENTAL_3_QUARTER = '((three|3)[ -]quarter|¾|3/4)[ -]?';
+
+var ACCIDENTAL_PATTERNS = (_ACCIDENTAL_PATTERNS = {}, _defineProperty(_ACCIDENTAL_PATTERNS, '', ACCIDENTAL_NATURAL), _defineProperty(_ACCIDENTAL_PATTERNS, PATTERN_ACCIDENTAL_FLAT, ACCIDENTAL_FLAT), _defineProperty(_ACCIDENTAL_PATTERNS, PATTERN_ACCIDENTAL_SHARP, ACCIDENTAL_SHARP), _defineProperty(_ACCIDENTAL_PATTERNS, '(-|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTAL_QUARTER_FLAT), _defineProperty(_ACCIDENTAL_PATTERNS, '(\\+|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTAL_QUARTER_SHARP), _defineProperty(_ACCIDENTAL_PATTERNS, '(𝄫|bb|double[ -]' + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTAL_DOUBLE_FLAT), _defineProperty(_ACCIDENTAL_PATTERNS, '(𝄪|♯♯|##|double[ -]' + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTAL_DOUBLE_SHARP), _defineProperty(_ACCIDENTAL_PATTERNS, '(' + PATTERN_ACCIDENTAL_FLAT + '-|' + PATTERN_ACCIDENTAL_3_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTAL_THREE_QUARTER_FLAT), _defineProperty(_ACCIDENTAL_PATTERNS, '(' + PATTERN_ACCIDENTAL_SHARP + '\\+|' + PATTERN_ACCIDENTAL_3_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTAL_THREE_QUARTER_SHARP), _ACCIDENTAL_PATTERNS);
+
+var normalizeAccidental = function normalizeAccidental(accidental) {
+  accidental = accidental.trim();
+
+  for (var pattern in ACCIDENTAL_PATTERNS) {
+    var replacement = ACCIDENTAL_PATTERNS[pattern];
+    if (accidental === replacement || new RegExp('^' + pattern + '$', 'iu').test(accidental)) {
+      return replacement;
+    }
+  }
+
+  throw new Error('Invalid accidental: ' + accidental);
+};
+
+var accidentalCents = (_accidentalCents = {}, _defineProperty(_accidentalCents, ACCIDENTAL_NATURAL, 0), _defineProperty(_accidentalCents, ACCIDENTAL_FLAT, -100), _defineProperty(_accidentalCents, ACCIDENTAL_SHARP, -100), _defineProperty(_accidentalCents, ACCIDENTAL_QUARTER_FLAT, -50), _defineProperty(_accidentalCents, ACCIDENTAL_QUARTER_SHARP, 50), _defineProperty(_accidentalCents, ACCIDENTAL_DOUBLE_FLAT, -200), _defineProperty(_accidentalCents, ACCIDENTAL_DOUBLE_SHARP, 200), _defineProperty(_accidentalCents, ACCIDENTAL_THREE_QUARTER_FLAT, -150), _defineProperty(_accidentalCents, ACCIDENTAL_THREE_QUARTER_SHARP, 150), _accidentalCents);
+
+var nameCents = {
+  'C': 0,
+  'D': 200,
+  'E': 400,
+  'F': 500,
+  'G': 700,
+  'A': 900,
+  'B': 1100
+};
+
+var defaultPreferredAccidentals = [ACCIDENTAL_NATURAL, ACCIDENTAL_SHARP, ACCIDENTAL_FLAT, ACCIDENTAL_QUARTER_SHARP, ACCIDENTAL_QUARTER_FLAT, ACCIDENTAL_DOUBLE_SHARP, ACCIDENTAL_DOUBLE_FLAT, ACCIDENTAL_THREE_QUARTER_FLAT, ACCIDENTAL_THREE_QUARTER_SHARP];
+
+var Note = function () {
+  function Note(name) {
+    var accidental = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+    var octave = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 4;
+    var difference = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0;
+
+    _classCallCheck(this, Note);
+
+    if (octave > 1000) {
+      throw new Error('Invalid octave: ' + octave);
+    }
+
+    this.name = name;
+    this.accidental = accidental;
+    this.octave = octave;
+    this.difference = difference;
+  }
+
+  _createClass(Note, [{
+    key: 'toString',
+    value: function toString() {
+      var output = this.name + this.accidental + this.octave;
+      if (!Math.isEqual(this.difference, 0)) {
+        output += ' ' + (this.difference > 0 ? '+' : '') + this.difference + '¢';
+      }
+
+      return output;
+    }
+  }, {
+    key: 'getFrequency',
+    value: function getFrequency() {
+      var a4 = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 440;
+
+      return _Cents2.default.centsToFrequency(this.cents - 900, a4);
+    }
+  }, {
+    key: 'cents',
+    get: function get() {
+      return nameCents[this.name] + accidentalCents[this.accidental] + (this.octave - 4) * 1200 + this.difference;
+    }
+  }], [{
+    key: 'fromCents',
+    value: function fromCents(cents) {
+      var preferredAccidentals = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
+
+      var rounded = Math.round(cents / 50) * 50,
+          difference = Math.round((cents - rounded) * 100) / 100,
+          octave = Math.floor(rounded / 1200) + 4,
+          centsWithoutOctave = rounded - (octave - 4) * 1200,
+          names = Object.keys(nameCents);
+
+      var _arr = [].concat(_toConsumableArray(preferredAccidentals), defaultPreferredAccidentals);
+
+      var _loop = function _loop() {
+        var accidental = _arr[_i];
+        var cents = centsWithoutOctave - accidentalCents[accidental],
+            noteName = names.find(function (key) {
+          return nameCents[key] === cents;
+        });
+        if (noteName !== undefined) {
+          return {
+            v: new Note(noteName, accidental, octave, difference)
+          };
+        }
+      };
+
+      for (var _i = 0; _i < _arr.length; _i++) {
+        var _ret = _loop();
+
+        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+      }
+
+      throw new Error('Failed to find note name for cents: ' + cents);
+    }
+  }, {
+    key: 'fromFrequency',
+    value: function fromFrequency(frequency) {
+      var a4 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 440;
+      var preferredAccidentals = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : [];
+
+      return Note.fromCents(_Cents2.default.frequencyToCents(frequency, a4), preferredAccidentals);
+    }
+  }, {
+    key: 'fromName',
+    value: function fromName(name) {
+      var rest = name;
+      var matches = rest.match(/^[a-g]/i);
+      if (matches === null) {
+        throw new Error('Invalid note name: ' + name);
+      }
+      var noteName = matches[0].toUpperCase();
+      rest = name.substr(matches[0].length);
+      if (rest.match(/^\-[0-9]+$/i)) {
+        throw new Error('Ambiguous note: ' + name + ' (does "-" mean a quarter-flat or a negative?)');
+      }
+      matches = rest.match(new RegExp('\/? *(\-?[0-9]+)?( +([\+-][0-9]+(\.[0-9]+)?) *[c¢])?$', 'iu'));
+      var octave = matches[1] !== undefined ? parseInt(matches[1], 10) : 4;
+      var difference = matches[3] !== undefined ? Math.round(matches[3] * 100) / 100 : 0;
+      rest = rest.substr(0, rest.length - matches[0].length);
+      var accidental = normalizeAccidental(rest);
+
+      return new Note(noteName, accidental, octave, difference);
+    }
+  }]);
+
+  return Note;
+}();
+
+exports.default = Note;
+module.exports = exports['default'];
 
 /***/ })
 /******/ ]);

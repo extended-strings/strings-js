@@ -1,8 +1,5 @@
 import Cents from './Cents';
-
-function gcd(a, b) {
-  return b === 0 ? a : gcd(b, a % b);
-}
+import Math from './Math';
 
 export default class Harmonic {
   constructor(halfStop, baseStop, stringFrequency) {
@@ -10,24 +7,27 @@ export default class Harmonic {
       throw new Error('The half-stop cannot be lower than the base stop.');
     }
 
-    this.halfStop = parseFloat(halfStop);
-    this.baseStop = parseFloat(baseStop);
+    this.halfStop = halfStop;
+    this.baseStop = baseStop;
     this.stringFrequency = stringFrequency;
   }
 
   get number() {
-    let number = Math.round(1 / gcd(1, this.halfStop / this.baseStop));
+    const number = Math.round(1 / Math.gcd(1, this.halfStop / this.baseStop));
     Object.defineProperty(this, 'number', {value: number, writable: false});
 
     return number;
   }
 
   get isNatural() {
-    return this.baseStop === 1.0;
+    return Math.isEqual(this.baseStop, 1);
   }
 
   get frequency() {
-    return Harmonic.getSoundingFrequency(this.number, this.baseStop, this.stringFrequency);
+    const frequency = Harmonic.getSoundingFrequency(this.number, this.baseStop, this.stringFrequency);
+    Object.defineProperty(this, 'frequency', {value: frequency, writable: false});
+
+    return frequency;
   }
 
   static getSoundingFrequency(number, stringLength, stringFrequency) {
@@ -39,7 +39,7 @@ export default class Harmonic {
   static getStringLengthsFromNumber(number, exclusive = false) {
     let harmonics = [];
     for (let numerator = 1; numerator <= number; numerator++) {
-      if (!exclusive || numerator === 1 || gcd(numerator, number) === 1) {
+      if (!exclusive || numerator === 1 || Math.isEqual(Math.gcd(numerator, number), 1)) {
         harmonics.push(numerator / number);
       }
     }
