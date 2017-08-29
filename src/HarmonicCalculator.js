@@ -27,7 +27,7 @@ export default class HarmonicCalculator {
   findArtificialHarmonics(soundingNote, stringFrequency) {
     let harmonics = [];
     const soundingNoteFrequency = soundingNote.getFrequency();
-    for (let number = 6; number >= 2; number--) {
+    for (let number = 2; number <= 6; number++) {
       const fundamental = soundingNoteFrequency / number;
       if (Math.isGreaterThan(fundamental, stringFrequency)) {
         const baseStop = Cents.frequencyToStringLength(fundamental, stringFrequency),
@@ -76,8 +76,8 @@ export default class HarmonicCalculator {
     let harmonics = [];
     for (const stringFrequency of instrument.stringFrequencies) {
       harmonics.push(
-        ...this.findArtificialHarmonics(soundingNote, stringFrequency),
-        ...this.findNaturalHarmonics(soundingNote, stringFrequency)
+        ...this.findNaturalHarmonics(soundingNote, stringFrequency),
+        ...this.findArtificialHarmonics(soundingNote, stringFrequency)
       );
     }
 

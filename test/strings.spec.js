@@ -9,7 +9,7 @@ const expect = chai.expect;
 
 // @todo work out how to use Chai properly
 describe('when I create a Note from name', () => {
-  const noteName = 'D3',
+  const noteName = 'D/3',
     note = Note.fromName(noteName);
 
   it('returns the right name when recreated from its frequency', () => {
@@ -33,7 +33,7 @@ describe('when I create a Note from cents', () => {
   let note = Note.fromCents(900);
 
   it('is correctly notated', () => {
-    expect(note.toString()).to.be.equals('A4');
+    expect(note.toString()).to.be.equals('A/4');
   });
   it('returns the right number of cents', () => {
     expect(note.cents).to.be.equals(900);
@@ -47,7 +47,7 @@ describe('when I create a Note from frequency', () => {
   let note = Note.fromFrequency(220.0);
 
   it('is correctly notated', () => {
-    expect(note.toString()).to.be.equals('A3');
+    expect(note.toString()).to.be.equals('A/3');
   });
   it('returns the right number of cents', () => {
     expect(note.cents).to.be.equals(-300);

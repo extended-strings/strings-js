@@ -1,34 +1,43 @@
 import Cents from './Cents';
 
-const ACCIDENTAL_NATURAL = '';
-const ACCIDENTAL_SHARP = '♯';
-const ACCIDENTAL_FLAT = '♭';
-const ACCIDENTAL_DOUBLE_SHARP = 'x';
-const ACCIDENTAL_DOUBLE_FLAT = '♭♭';
-const ACCIDENTAL_QUARTER_SHARP = '¼♯';
-const ACCIDENTAL_QUARTER_FLAT = '¼♭';
-const ACCIDENTAL_THREE_QUARTER_SHARP = '¾♯';
-const ACCIDENTAL_THREE_QUARTER_FLAT = '¾♭';
+export const ACCIDENTALS = {
+  none: '',
+  natural: '♮',
+  sharp: '♯',
+  flat: '♭',
+  doubleSharp: 'x',
+  doubleFlat: '♭♭',
+  quarterSharp: '¼♯',
+  quarterFlat: '¼♭',
+  threeQuarterSharp: '¾♯',
+  threeQuarterFlat: '¾♭'
+};
 
-const PATTERN_ACCIDENTAL_SHARP = '([♯s#]|sharp)';
-const PATTERN_ACCIDENTAL_FLAT = '([♭fb]|flat)';
-const PATTERN_ACCIDENTAL_QUARTER = '(quarter|¼|1/4)[ -]?';
-const PATTERN_ACCIDENTAL_3_QUARTER = '((three|3)[ -]quarter|¾|3/4)[ -]?';
+const PATTERN_ACCIDENTAL_NATURAL = '([♮n]|nat(ural)?)';
+const PATTERN_ACCIDENTAL_SHARP = '([♯s#]|sh(arp)?)';
+const PATTERN_ACCIDENTAL_FLAT = '([♭fb]|fl(at)?)';
+const PATTERN_ACCIDENTAL_QUARTER = '(q|quarter|¼|1/4)[ -]?';
+const PATTERN_ACCIDENTAL_3_QUARTER = '((three|3)[ -]q|quarter|¾|3/4)[ -]?';
+
+const PATTERN_NAME = /^ *[a-g]/i;
+const PATTERN_OCTAVE = new RegExp('[/ ]? *(\-?[0-9]+)\\b');
+const PATTERN_DIFFERENCE = new RegExp('([+-][0-9]+(\.[0-9]+)?) *[c¢]', 'iu');
 
 const ACCIDENTAL_PATTERNS = {
-  ['']: ACCIDENTAL_NATURAL,
-  [PATTERN_ACCIDENTAL_FLAT]: ACCIDENTAL_FLAT,
-  [PATTERN_ACCIDENTAL_SHARP]: ACCIDENTAL_SHARP,
-  ['(-|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')']: ACCIDENTAL_QUARTER_FLAT,
-  ['(\\+|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')']: ACCIDENTAL_QUARTER_SHARP,
-  ['(𝄫|bb|double[ -]' + PATTERN_ACCIDENTAL_FLAT + ')']: ACCIDENTAL_DOUBLE_FLAT,
-  ['(𝄪|♯♯|##|double[ -]' + PATTERN_ACCIDENTAL_SHARP + ')']: ACCIDENTAL_DOUBLE_SHARP,
+  ['']: ACCIDENTALS.none,
+  [PATTERN_ACCIDENTAL_NATURAL]: ACCIDENTALS.natural,
+  [PATTERN_ACCIDENTAL_FLAT]: ACCIDENTALS.flat,
+  [PATTERN_ACCIDENTAL_SHARP]: ACCIDENTALS.sharp,
+  ['(-|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')']: ACCIDENTALS.quarterFlat,
+  ['(\\+|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')']: ACCIDENTALS.quarterSharp,
+  ['(𝄫|bb|double[ -]' + PATTERN_ACCIDENTAL_FLAT + ')']: ACCIDENTALS.doubleFlat,
+  ['(𝄪|♯♯|##|double[ -]' + PATTERN_ACCIDENTAL_SHARP + ')']: ACCIDENTALS.doubleSharp,
   [
     '(' + PATTERN_ACCIDENTAL_FLAT + '-|' + PATTERN_ACCIDENTAL_3_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')'
-  ]: ACCIDENTAL_THREE_QUARTER_FLAT,
+  ]: ACCIDENTALS.threeQuarterFlat,
   [
     '(' + PATTERN_ACCIDENTAL_SHARP + '\\+|' + PATTERN_ACCIDENTAL_3_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')'
-  ]: ACCIDENTAL_THREE_QUARTER_SHARP
+  ]: ACCIDENTALS.threeQuarterSharp
 };
 
 const normalizeAccidental = function (accidental) {
@@ -45,15 +54,16 @@ const normalizeAccidental = function (accidental) {
 };
 
 const accidentalCents = {
-  [ACCIDENTAL_NATURAL]: 0,
-  [ACCIDENTAL_FLAT]: -100,
-  [ACCIDENTAL_SHARP]: -100,
-  [ACCIDENTAL_QUARTER_FLAT]: -50,
-  [ACCIDENTAL_QUARTER_SHARP]: 50,
-  [ACCIDENTAL_DOUBLE_FLAT]: -200,
-  [ACCIDENTAL_DOUBLE_SHARP]: 200,
-  [ACCIDENTAL_THREE_QUARTER_FLAT]: -150,
-  [ACCIDENTAL_THREE_QUARTER_SHARP]: 150
+  [ACCIDENTALS.none]: 0,
+  [ACCIDENTALS.natural]: 0,
+  [ACCIDENTALS.flat]: -100,
+  [ACCIDENTALS.sharp]: 100,
+  [ACCIDENTALS.quarterFlat]: -50,
+  [ACCIDENTALS.quarterSharp]: 50,
+  [ACCIDENTALS.doubleFlat]: -200,
+  [ACCIDENTALS.doubleSharp]: 200,
+  [ACCIDENTALS.threeQuarterFlat]: -150,
+  [ACCIDENTALS.threeQuarterSharp]: 150
 };
 
 const nameCents = {
@@ -67,15 +77,16 @@ const nameCents = {
 };
 
 const defaultPreferredAccidentals = [
-  ACCIDENTAL_NATURAL,
-  ACCIDENTAL_SHARP,
-  ACCIDENTAL_FLAT,
-  ACCIDENTAL_QUARTER_SHARP,
-  ACCIDENTAL_QUARTER_FLAT,
-  ACCIDENTAL_DOUBLE_SHARP,
-  ACCIDENTAL_DOUBLE_FLAT,
-  ACCIDENTAL_THREE_QUARTER_FLAT,
-  ACCIDENTAL_THREE_QUARTER_SHARP
+  ACCIDENTALS.none,
+  ACCIDENTALS.natural,
+  ACCIDENTALS.sharp,
+  ACCIDENTALS.flat,
+  ACCIDENTALS.quarterSharp,
+  ACCIDENTALS.quarterFlat,
+  ACCIDENTALS.doubleSharp,
+  ACCIDENTALS.doubleFlat,
+  ACCIDENTALS.threeQuarterSharp,
+  ACCIDENTALS.threeQuarterFlat
 ];
 
 export default class Note {
@@ -91,11 +102,17 @@ export default class Note {
   }
 
   static fromCents(cents, preferredAccidentals = []) {
-    const rounded = Math.round(cents / 50) * 50,
-      difference = Math.round((cents - rounded) * 100) / 100,
+    const rounded = Math.toNearest(cents, 50),
+      difference = Math.toDecimalPlaces(cents - rounded, 2),
       octave = Math.floor(rounded / 1200) + 4,
       centsWithoutOctave = rounded - ((octave - 4) * 1200),
       names = Object.keys(nameCents);
+
+    // If the preferredAccidentals contains only a natural, also prefer flats.
+    if (preferredAccidentals.length === 1 &&
+      (preferredAccidentals[0] === ACCIDENTALS.none || preferredAccidentals[0] === ACCIDENTALS.natural)) {
+      preferredAccidentals.push(ACCIDENTALS.flat, ACCIDENTALS.quarterFlat);
+    }
 
     for (const accidental of [...preferredAccidentals, ...defaultPreferredAccidentals]) {
       const cents = centsWithoutOctave - accidentalCents[accidental],
@@ -112,28 +129,53 @@ export default class Note {
     return Note.fromCents(Cents.frequencyToCents(frequency, a4), preferredAccidentals);
   }
 
-  static fromName(name) {
+  static fromName(name, {octave = 4, accidental = ACCIDENTALS.none, difference = 0} = {}) {
     let rest = name;
-    let matches = rest.match(/^[a-g]/i);
+
+    // Extract the note name (A-G).
+    let matches = rest.match(PATTERN_NAME);
     if (matches === null) {
       throw new Error(`Invalid note name: ${name}`);
     }
     const noteName = matches[0].toUpperCase();
-    rest = name.substr(matches[0].length);
-    if (rest.match(/^\-[0-9]+$/i)) {
-      throw new Error(`Ambiguous note: ${name} (does "-" mean a quarter-flat or a negative?)`);
-    }
-    matches = rest.match(new RegExp('\/? *(\-?[0-9]+)?( +([\+-][0-9]+(\.[0-9]+)?) *[c¢])?$', 'iu'));
-    const octave = matches[1] !== undefined ? parseInt(matches[1], 10) : 4;
-    const difference = matches[3] !== undefined ? Math.round(matches[3] * 100) / 100 : 0;
-    rest = rest.substr(0, rest.length - matches[0].length);
-    const accidental = normalizeAccidental(rest);
+    rest = rest.replace(PATTERN_NAME, '').trim();
 
-    return new Note(noteName, accidental, octave, difference);
+    // Check for ambiguities.
+    // @todo this probably can be extended
+    matches = rest.match(/^([+-])[0-9]+$/);
+    if (matches !== null) {
+      throw new Error(`Ambiguous note: ${name} (is "${matches[1]}" an accidental?)`);
+    }
+
+    // Extract the cents difference (e.g. +2c).
+    matches = rest.match(PATTERN_DIFFERENCE);
+    if (matches !== null) {
+      difference = matches[1];
+      rest = rest.replace(PATTERN_DIFFERENCE, '').trim();
+    }
+
+    // Extract the octave.
+    matches = rest.match(PATTERN_OCTAVE);
+    if (matches !== null) {
+      octave = parseInt(matches[1], 10);
+      rest = rest.replace(PATTERN_OCTAVE, '').trim();
+    }
+
+    // Normalize the octave and cents difference.
+    if (difference >= 1200) {
+      const diffOctave = Math.round(difference / 1200);
+      octave += diffOctave;
+      difference -= diffOctave * 1200;
+    }
+
+    // The rest of the string (if any) is treated as the accidental.
+    accidental = rest ? normalizeAccidental(rest) : normalizeAccidental(accidental);
+
+    return new Note(noteName, accidental, octave, Math.toDecimalPlaces(difference, 2));
   }
 
   toString() {
-    let output = this.name + this.accidental + this.octave;
+    let output = this.name + this.accidental + '/' + this.octave;
     if (!Math.isEqual(this.difference, 0)) {
       output += ' ' + (this.difference > 0 ? '+' : '') + this.difference + '¢';
     }
@@ -151,5 +193,4 @@ export default class Note {
   getFrequency(a4 = 440) {
     return Cents.centsToFrequency(this.cents - 900, a4);
   }
-
 }

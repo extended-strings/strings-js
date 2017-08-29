@@ -164,6 +164,8 @@ var _Note2 = _interopRequireDefault(_Note);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+_Note2.default.ACCIDENTALS = _Note.ACCIDENTALS;
+
 exports.Harmonic = _Harmonic2.default;
 exports.HarmonicCalculator = _HarmonicCalculator2.default;
 exports.Instrument = _Instrument2.default;
@@ -292,6 +294,23 @@ Math.gcd = function (a, b) {
   return this.isEqual(b, 0) ? a : this.gcd(b, a % b);
 };
 
+Math.toNearest = function (number) {
+  var nearest = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 1;
+
+  return Math.round(number / nearest) * nearest;
+};
+
+Math.toDecimalPlaces = function (number) {
+  var dp = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0;
+
+  if (dp === 0) {
+    return Math.round(number);
+  }
+  var multiplier = this.pow(10, dp);
+
+  return Math.round(number * multiplier) / multiplier;
+};
+
 exports.default = Math;
 module.exports = exports["default"];
 
@@ -359,7 +378,7 @@ var HarmonicCalculator = function () {
     value: function findArtificialHarmonics(soundingNote, stringFrequency) {
       var harmonics = [];
       var soundingNoteFrequency = soundingNote.getFrequency();
-      for (var number = 6; number >= 2; number--) {
+      for (var number = 2; number <= 6; number++) {
         var fundamental = soundingNoteFrequency / number;
         if (_Math2.default.isGreaterThan(fundamental, stringFrequency)) {
           var baseStop = _Cents2.default.frequencyToStringLength(fundamental, stringFrequency),
@@ -442,7 +461,7 @@ var HarmonicCalculator = function () {
 
           var stringFrequency = _step2.value;
 
-          (_harmonics = harmonics).push.apply(_harmonics, _toConsumableArray(this.findArtificialHarmonics(soundingNote, stringFrequency)).concat(_toConsumableArray(this.findNaturalHarmonics(soundingNote, stringFrequency))));
+          (_harmonics = harmonics).push.apply(_harmonics, _toConsumableArray(this.findNaturalHarmonics(soundingNote, stringFrequency)).concat(_toConsumableArray(this.findArtificialHarmonics(soundingNote, stringFrequency))));
         }
       } catch (err) {
         _didIteratorError2 = true;
@@ -580,6 +599,7 @@ exports.default = Instrument;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.ACCIDENTALS = undefined;
 
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
@@ -599,22 +619,30 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
-var ACCIDENTAL_NATURAL = '';
-var ACCIDENTAL_SHARP = '♯';
-var ACCIDENTAL_FLAT = '♭';
-var ACCIDENTAL_DOUBLE_SHARP = 'x';
-var ACCIDENTAL_DOUBLE_FLAT = '♭♭';
-var ACCIDENTAL_QUARTER_SHARP = '¼♯';
-var ACCIDENTAL_QUARTER_FLAT = '¼♭';
-var ACCIDENTAL_THREE_QUARTER_SHARP = '¾♯';
-var ACCIDENTAL_THREE_QUARTER_FLAT = '¾♭';
+var ACCIDENTALS = exports.ACCIDENTALS = {
+  none: '',
+  natural: '♮',
+  sharp: '♯',
+  flat: '♭',
+  doubleSharp: 'x',
+  doubleFlat: '♭♭',
+  quarterSharp: '¼♯',
+  quarterFlat: '¼♭',
+  threeQuarterSharp: '¾♯',
+  threeQuarterFlat: '¾♭'
+};
 
-var PATTERN_ACCIDENTAL_SHARP = '([♯s#]|sharp)';
-var PATTERN_ACCIDENTAL_FLAT = '([♭fb]|flat)';
-var PATTERN_ACCIDENTAL_QUARTER = '(quarter|¼|1/4)[ -]?';
-var PATTERN_ACCIDENTAL_3_QUARTER = '((three|3)[ -]quarter|¾|3/4)[ -]?';
+var PATTERN_ACCIDENTAL_NATURAL = '([♮n]|nat(ural)?)';
+var PATTERN_ACCIDENTAL_SHARP = '([♯s#]|sh(arp)?)';
+var PATTERN_ACCIDENTAL_FLAT = '([♭fb]|fl(at)?)';
+var PATTERN_ACCIDENTAL_QUARTER = '(q|quarter|¼|1/4)[ -]?';
+var PATTERN_ACCIDENTAL_3_QUARTER = '((three|3)[ -]q|quarter|¾|3/4)[ -]?';
 
-var ACCIDENTAL_PATTERNS = (_ACCIDENTAL_PATTERNS = {}, _defineProperty(_ACCIDENTAL_PATTERNS, '', ACCIDENTAL_NATURAL), _defineProperty(_ACCIDENTAL_PATTERNS, PATTERN_ACCIDENTAL_FLAT, ACCIDENTAL_FLAT), _defineProperty(_ACCIDENTAL_PATTERNS, PATTERN_ACCIDENTAL_SHARP, ACCIDENTAL_SHARP), _defineProperty(_ACCIDENTAL_PATTERNS, '(-|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTAL_QUARTER_FLAT), _defineProperty(_ACCIDENTAL_PATTERNS, '(\\+|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTAL_QUARTER_SHARP), _defineProperty(_ACCIDENTAL_PATTERNS, '(𝄫|bb|double[ -]' + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTAL_DOUBLE_FLAT), _defineProperty(_ACCIDENTAL_PATTERNS, '(𝄪|♯♯|##|double[ -]' + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTAL_DOUBLE_SHARP), _defineProperty(_ACCIDENTAL_PATTERNS, '(' + PATTERN_ACCIDENTAL_FLAT + '-|' + PATTERN_ACCIDENTAL_3_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTAL_THREE_QUARTER_FLAT), _defineProperty(_ACCIDENTAL_PATTERNS, '(' + PATTERN_ACCIDENTAL_SHARP + '\\+|' + PATTERN_ACCIDENTAL_3_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTAL_THREE_QUARTER_SHARP), _ACCIDENTAL_PATTERNS);
+var PATTERN_NAME = /^ *[a-g]/i;
+var PATTERN_OCTAVE = new RegExp('[/ ]? *(\-?[0-9]+)\\b');
+var PATTERN_DIFFERENCE = new RegExp('([+-][0-9]+(\.[0-9]+)?) *[c¢]', 'iu');
+
+var ACCIDENTAL_PATTERNS = (_ACCIDENTAL_PATTERNS = {}, _defineProperty(_ACCIDENTAL_PATTERNS, '', ACCIDENTALS.none), _defineProperty(_ACCIDENTAL_PATTERNS, PATTERN_ACCIDENTAL_NATURAL, ACCIDENTALS.natural), _defineProperty(_ACCIDENTAL_PATTERNS, PATTERN_ACCIDENTAL_FLAT, ACCIDENTALS.flat), _defineProperty(_ACCIDENTAL_PATTERNS, PATTERN_ACCIDENTAL_SHARP, ACCIDENTALS.sharp), _defineProperty(_ACCIDENTAL_PATTERNS, '(-|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTALS.quarterFlat), _defineProperty(_ACCIDENTAL_PATTERNS, '(\\+|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTALS.quarterSharp), _defineProperty(_ACCIDENTAL_PATTERNS, '(𝄫|bb|double[ -]' + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTALS.doubleFlat), _defineProperty(_ACCIDENTAL_PATTERNS, '(𝄪|♯♯|##|double[ -]' + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTALS.doubleSharp), _defineProperty(_ACCIDENTAL_PATTERNS, '(' + PATTERN_ACCIDENTAL_FLAT + '-|' + PATTERN_ACCIDENTAL_3_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTALS.threeQuarterFlat), _defineProperty(_ACCIDENTAL_PATTERNS, '(' + PATTERN_ACCIDENTAL_SHARP + '\\+|' + PATTERN_ACCIDENTAL_3_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTALS.threeQuarterSharp), _ACCIDENTAL_PATTERNS);
 
 var normalizeAccidental = function normalizeAccidental(accidental) {
   accidental = accidental.trim();
@@ -629,7 +657,7 @@ var normalizeAccidental = function normalizeAccidental(accidental) {
   throw new Error('Invalid accidental: ' + accidental);
 };
 
-var accidentalCents = (_accidentalCents = {}, _defineProperty(_accidentalCents, ACCIDENTAL_NATURAL, 0), _defineProperty(_accidentalCents, ACCIDENTAL_FLAT, -100), _defineProperty(_accidentalCents, ACCIDENTAL_SHARP, -100), _defineProperty(_accidentalCents, ACCIDENTAL_QUARTER_FLAT, -50), _defineProperty(_accidentalCents, ACCIDENTAL_QUARTER_SHARP, 50), _defineProperty(_accidentalCents, ACCIDENTAL_DOUBLE_FLAT, -200), _defineProperty(_accidentalCents, ACCIDENTAL_DOUBLE_SHARP, 200), _defineProperty(_accidentalCents, ACCIDENTAL_THREE_QUARTER_FLAT, -150), _defineProperty(_accidentalCents, ACCIDENTAL_THREE_QUARTER_SHARP, 150), _accidentalCents);
+var accidentalCents = (_accidentalCents = {}, _defineProperty(_accidentalCents, ACCIDENTALS.none, 0), _defineProperty(_accidentalCents, ACCIDENTALS.natural, 0), _defineProperty(_accidentalCents, ACCIDENTALS.flat, -100), _defineProperty(_accidentalCents, ACCIDENTALS.sharp, 100), _defineProperty(_accidentalCents, ACCIDENTALS.quarterFlat, -50), _defineProperty(_accidentalCents, ACCIDENTALS.quarterSharp, 50), _defineProperty(_accidentalCents, ACCIDENTALS.doubleFlat, -200), _defineProperty(_accidentalCents, ACCIDENTALS.doubleSharp, 200), _defineProperty(_accidentalCents, ACCIDENTALS.threeQuarterFlat, -150), _defineProperty(_accidentalCents, ACCIDENTALS.threeQuarterSharp, 150), _accidentalCents);
 
 var nameCents = {
   'C': 0,
@@ -641,7 +669,7 @@ var nameCents = {
   'B': 1100
 };
 
-var defaultPreferredAccidentals = [ACCIDENTAL_NATURAL, ACCIDENTAL_SHARP, ACCIDENTAL_FLAT, ACCIDENTAL_QUARTER_SHARP, ACCIDENTAL_QUARTER_FLAT, ACCIDENTAL_DOUBLE_SHARP, ACCIDENTAL_DOUBLE_FLAT, ACCIDENTAL_THREE_QUARTER_FLAT, ACCIDENTAL_THREE_QUARTER_SHARP];
+var defaultPreferredAccidentals = [ACCIDENTALS.none, ACCIDENTALS.natural, ACCIDENTALS.sharp, ACCIDENTALS.flat, ACCIDENTALS.quarterSharp, ACCIDENTALS.quarterFlat, ACCIDENTALS.doubleSharp, ACCIDENTALS.doubleFlat, ACCIDENTALS.threeQuarterSharp, ACCIDENTALS.threeQuarterFlat];
 
 var Note = function () {
   function Note(name) {
@@ -664,7 +692,7 @@ var Note = function () {
   _createClass(Note, [{
     key: 'toString',
     value: function toString() {
-      var output = this.name + this.accidental + this.octave;
+      var output = this.name + this.accidental + '/' + this.octave;
       if (!Math.isEqual(this.difference, 0)) {
         output += ' ' + (this.difference > 0 ? '+' : '') + this.difference + '¢';
       }
@@ -688,11 +716,16 @@ var Note = function () {
     value: function fromCents(cents) {
       var preferredAccidentals = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : [];
 
-      var rounded = Math.round(cents / 50) * 50,
-          difference = Math.round((cents - rounded) * 100) / 100,
+      var rounded = Math.toNearest(cents, 50),
+          difference = Math.toDecimalPlaces(cents - rounded, 2),
           octave = Math.floor(rounded / 1200) + 4,
           centsWithoutOctave = rounded - (octave - 4) * 1200,
           names = Object.keys(nameCents);
+
+      // If the preferredAccidentals contains only a natural, also prefer flats.
+      if (preferredAccidentals.length === 1 && (preferredAccidentals[0] === ACCIDENTALS.none || preferredAccidentals[0] === ACCIDENTALS.natural)) {
+        preferredAccidentals.push(ACCIDENTALS.flat, ACCIDENTALS.quarterFlat);
+      }
 
       var _arr = [].concat(_toConsumableArray(preferredAccidentals), defaultPreferredAccidentals);
 
@@ -728,23 +761,56 @@ var Note = function () {
   }, {
     key: 'fromName',
     value: function fromName(name) {
+      var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+          _ref$octave = _ref.octave,
+          octave = _ref$octave === undefined ? 4 : _ref$octave,
+          _ref$accidental = _ref.accidental,
+          accidental = _ref$accidental === undefined ? ACCIDENTALS.none : _ref$accidental,
+          _ref$difference = _ref.difference,
+          difference = _ref$difference === undefined ? 0 : _ref$difference;
+
       var rest = name;
-      var matches = rest.match(/^[a-g]/i);
+
+      // Extract the note name (A-G).
+      var matches = rest.match(PATTERN_NAME);
       if (matches === null) {
         throw new Error('Invalid note name: ' + name);
       }
       var noteName = matches[0].toUpperCase();
-      rest = name.substr(matches[0].length);
-      if (rest.match(/^\-[0-9]+$/i)) {
-        throw new Error('Ambiguous note: ' + name + ' (does "-" mean a quarter-flat or a negative?)');
-      }
-      matches = rest.match(new RegExp('\/? *(\-?[0-9]+)?( +([\+-][0-9]+(\.[0-9]+)?) *[c¢])?$', 'iu'));
-      var octave = matches[1] !== undefined ? parseInt(matches[1], 10) : 4;
-      var difference = matches[3] !== undefined ? Math.round(matches[3] * 100) / 100 : 0;
-      rest = rest.substr(0, rest.length - matches[0].length);
-      var accidental = normalizeAccidental(rest);
+      rest = rest.replace(PATTERN_NAME, '').trim();
 
-      return new Note(noteName, accidental, octave, difference);
+      // Check for ambiguities.
+      // @todo this probably can be extended
+      matches = rest.match(/^([+-])[0-9]+$/);
+      if (matches !== null) {
+        throw new Error('Ambiguous note: ' + name + ' (is "' + matches[1] + '" an accidental?)');
+      }
+
+      // Extract the cents difference (e.g. +2c).
+      matches = rest.match(PATTERN_DIFFERENCE);
+      if (matches !== null) {
+        difference = matches[1];
+        rest = rest.replace(PATTERN_DIFFERENCE, '').trim();
+      }
+
+      // Extract the octave.
+      matches = rest.match(PATTERN_OCTAVE);
+      if (matches !== null) {
+        octave = parseInt(matches[1], 10);
+        rest = rest.replace(PATTERN_OCTAVE, '').trim();
+      }
+
+      // Normalize the octave and cents difference.
+      if (difference >= 1200) {
+        var diffOctave = Math.round(difference / 1200);
+        octave += diffOctave;
+        difference -= diffOctave * 1200;
+      }
+
+      // The rest of the string (if any) is treated as the accidental.
+      accidental = rest ? normalizeAccidental(rest) : normalizeAccidental(accidental);
+
+      return new Note(noteName, accidental, octave, Math.toDecimalPlaces(difference, 2));
     }
   }]);
 
@@ -752,7 +818,6 @@ var Note = function () {
 }();
 
 exports.default = Note;
-module.exports = exports['default'];
 
 /***/ })
 /******/ ]);
