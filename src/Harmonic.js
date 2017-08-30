@@ -23,6 +23,10 @@ export default class Harmonic {
     return Math.isEqual(this.baseStop, 1);
   }
 
+  get isOpenString() {
+    return Math.isEqual(this.halfStop, 1) && Math.isEqual(this.baseStop, 1);
+  }
+
   get frequency() {
     const frequency = Harmonic.getSoundingFrequency(this.number, this.baseStop, this.stringFrequency);
     Object.defineProperty(this, 'frequency', {value: frequency, writable: false});

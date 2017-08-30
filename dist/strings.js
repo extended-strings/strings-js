@@ -223,6 +223,11 @@ var Harmonic = function () {
       return _Math2.default.isEqual(this.baseStop, 1);
     }
   }, {
+    key: 'isOpenString',
+    get: function get() {
+      return _Math2.default.isEqual(this.halfStop, 1) && _Math2.default.isEqual(this.baseStop, 1);
+    }
+  }, {
     key: 'frequency',
     get: function get() {
       var frequency = Harmonic.getSoundingFrequency(this.number, this.baseStop, this.stringFrequency);
