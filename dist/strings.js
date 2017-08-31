@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 2);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -84,7 +84,62 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var CustomError = function CustomError(message) {
+  _classCallCheck(this, CustomError);
+
+  this.message = message || this.constructor.name;
+  this.stack = new Error().stack;
+};
+
+CustomError.prototype = Object.create(Error.prototype);
+
+var InvalidArgumentError = function (_CustomError) {
+  _inherits(InvalidArgumentError, _CustomError);
+
+  function InvalidArgumentError() {
+    _classCallCheck(this, InvalidArgumentError);
+
+    return _possibleConstructorReturn(this, (InvalidArgumentError.__proto__ || Object.getPrototypeOf(InvalidArgumentError)).apply(this, arguments));
+  }
+
+  return InvalidArgumentError;
+}(CustomError);
+
+var RuntimeError = function (_CustomError2) {
+  _inherits(RuntimeError, _CustomError2);
+
+  function RuntimeError() {
+    _classCallCheck(this, RuntimeError);
+
+    return _possibleConstructorReturn(this, (RuntimeError.__proto__ || Object.getPrototypeOf(RuntimeError)).apply(this, arguments));
+  }
+
+  return RuntimeError;
+}(CustomError);
+
+exports.InvalidArgumentError = InvalidArgumentError;
+exports.RuntimeError = RuntimeError;
+
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _errors = __webpack_require__(0);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -94,32 +149,32 @@ var Cents = function () {
   }
 
   _createClass(Cents, null, [{
-    key: "frequenciesToCents",
+    key: 'frequenciesToCents',
     value: function frequenciesToCents(lower, upper) {
       return Math.isEqual(lower, 0) ? 0 : 1200 * (Math.log(upper / lower) / Math.log(2));
     }
   }, {
-    key: "frequencyToCents",
+    key: 'frequencyToCents',
     value: function frequencyToCents(frequency) {
       var a4 = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 440;
 
       return Cents.frequenciesToCents(a4, frequency) + 900;
     }
   }, {
-    key: "centsToFrequency",
+    key: 'centsToFrequency',
     value: function centsToFrequency(cents, base) {
       return base * Math.pow(2, cents / 1200);
     }
   }, {
-    key: "centsToStringLength",
+    key: 'centsToStringLength',
     value: function centsToStringLength(cents) {
       return 1 / Math.pow(2, cents / 1200);
     }
   }, {
-    key: "frequencyToStringLength",
+    key: 'frequencyToStringLength',
     value: function frequencyToStringLength(frequency, stringFrequency) {
       if (Math.isEqual(frequency, 0)) {
-        throw new Error("Invalid frequency: " + frequency);
+        throw new _errors.InvalidArgumentError('Invalid (zero) frequency: ' + frequency);
       }
       var centsOverString = this.frequenciesToCents(stringFrequency, frequency);
 
@@ -132,10 +187,10 @@ var Cents = function () {
 
 exports.default = Cents;
 ;
-module.exports = exports["default"];
+module.exports = exports['default'];
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -146,19 +201,19 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports.Note = exports.Instrument = exports.HarmonicCalculator = exports.Harmonic = undefined;
 
-var _Harmonic = __webpack_require__(2);
+var _Harmonic = __webpack_require__(3);
 
 var _Harmonic2 = _interopRequireDefault(_Harmonic);
 
-var _HarmonicCalculator = __webpack_require__(4);
+var _HarmonicCalculator = __webpack_require__(5);
 
 var _HarmonicCalculator2 = _interopRequireDefault(_HarmonicCalculator);
 
-var _Instrument = __webpack_require__(5);
+var _Instrument = __webpack_require__(6);
 
 var _Instrument2 = _interopRequireDefault(_Instrument);
 
-var _Note = __webpack_require__(6);
+var _Note = __webpack_require__(7);
 
 var _Note2 = _interopRequireDefault(_Note);
 
@@ -172,7 +227,7 @@ exports.Instrument = _Instrument2.default;
 exports.Note = _Note2.default;
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -184,13 +239,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Cents = __webpack_require__(0);
+var _Cents = __webpack_require__(1);
 
 var _Cents2 = _interopRequireDefault(_Cents);
 
-var _Math = __webpack_require__(3);
+var _Math = __webpack_require__(4);
 
 var _Math2 = _interopRequireDefault(_Math);
+
+var _errors = __webpack_require__(0);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -201,7 +258,7 @@ var Harmonic = function () {
     _classCallCheck(this, Harmonic);
 
     if (halfStop > baseStop) {
-      throw new Error('The half-stop cannot be lower than the base stop.');
+      throw new _errors.InvalidArgumentError('The half-stop cannot be lower than the base stop.');
     }
 
     this.halfStop = halfStop;
@@ -256,17 +313,6 @@ var Harmonic = function () {
 
       return harmonics;
     }
-  }, {
-    key: 'getSeries',
-    value: function getSeries(limit) {
-      var series = [];
-      var base = 0;
-      for (var denominator = 1; denominator <= limit; denominator++) {
-        base = series[denominator] = base + 1 / denominator;
-      }
-
-      return series;
-    }
   }]);
 
   return Harmonic;
@@ -276,7 +322,7 @@ exports.default = Harmonic;
 module.exports = exports['default'];
 
 /***/ }),
-/* 3 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -320,7 +366,7 @@ exports.default = Math;
 module.exports = exports["default"];
 
 /***/ }),
-/* 4 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -332,15 +378,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _Cents = __webpack_require__(0);
+var _Cents = __webpack_require__(1);
 
 var _Cents2 = _interopRequireDefault(_Cents);
 
-var _Harmonic = __webpack_require__(2);
+var _Harmonic = __webpack_require__(3);
 
 var _Harmonic2 = _interopRequireDefault(_Harmonic);
 
-var _Math = __webpack_require__(3);
+var _Math = __webpack_require__(4);
 
 var _Math2 = _interopRequireDefault(_Math);
 
@@ -498,7 +544,7 @@ exports.default = HarmonicCalculator;
 module.exports = exports['default'];
 
 /***/ }),
-/* 5 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -511,7 +557,9 @@ exports.presets = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _index = __webpack_require__(1);
+var _index = __webpack_require__(2);
+
+var _errors = __webpack_require__(0);
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -582,7 +630,7 @@ var Instrument = function () {
     key: 'fromPreset',
     value: function fromPreset(preset) {
       if (presets[preset] === undefined) {
-        throw new Error('Preset not found: ' + preset);
+        throw new _errors.InvalidArgumentError('Preset not found: ' + preset);
       }
 
       return this.fromNames(presets[preset].names, presets[preset].length);
@@ -595,7 +643,7 @@ var Instrument = function () {
 exports.default = Instrument;
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -612,9 +660,11 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 var _ACCIDENTAL_PATTERNS, _accidentalCents;
 
-var _Cents = __webpack_require__(0);
+var _Cents = __webpack_require__(1);
 
 var _Cents2 = _interopRequireDefault(_Cents);
+
+var _errors = __webpack_require__(0);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -637,29 +687,27 @@ var ACCIDENTALS = exports.ACCIDENTALS = {
   threeQuarterFlat: '¾♭'
 };
 
-var PATTERN_ACCIDENTAL_NATURAL = '([♮n]|nat(ural)?)';
+var PATTERN_NAME = new RegExp('^ *[a-g]', 'i');
+var PATTERN_OCTAVE = new RegExp('[/ ]*([\-]? *[0-9]+)\\b');
+var PATTERN_DIFFERENCE = new RegExp('([+-]? *[0-9]+(\.[0-9]+)?) *(c(ent)?s?|¢)', 'iu');
+
 var PATTERN_ACCIDENTAL_SHARP = '([♯s#]|sh(arp)?)';
 var PATTERN_ACCIDENTAL_FLAT = '([♭fb]|fl(at)?)';
 var PATTERN_ACCIDENTAL_QUARTER = '(q|quarter|¼|1/4)[ -]?';
 var PATTERN_ACCIDENTAL_3_QUARTER = '((three|3)[ -]q|quarter|¾|3/4)[ -]?';
 
-var PATTERN_NAME = /^ *[a-g]/i;
-var PATTERN_OCTAVE = new RegExp('[/ ]? *(\-?[0-9]+)\\b');
-var PATTERN_DIFFERENCE = new RegExp('([+-][0-9]+(\.[0-9]+)?) *[c¢]', 'iu');
-
-var ACCIDENTAL_PATTERNS = (_ACCIDENTAL_PATTERNS = {}, _defineProperty(_ACCIDENTAL_PATTERNS, '', ACCIDENTALS.none), _defineProperty(_ACCIDENTAL_PATTERNS, PATTERN_ACCIDENTAL_NATURAL, ACCIDENTALS.natural), _defineProperty(_ACCIDENTAL_PATTERNS, PATTERN_ACCIDENTAL_FLAT, ACCIDENTALS.flat), _defineProperty(_ACCIDENTAL_PATTERNS, PATTERN_ACCIDENTAL_SHARP, ACCIDENTALS.sharp), _defineProperty(_ACCIDENTAL_PATTERNS, '(-|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTALS.quarterFlat), _defineProperty(_ACCIDENTAL_PATTERNS, '(\\+|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTALS.quarterSharp), _defineProperty(_ACCIDENTAL_PATTERNS, '(𝄫|bb|double[ -]' + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTALS.doubleFlat), _defineProperty(_ACCIDENTAL_PATTERNS, '(𝄪|♯♯|##|double[ -]' + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTALS.doubleSharp), _defineProperty(_ACCIDENTAL_PATTERNS, '(' + PATTERN_ACCIDENTAL_FLAT + '-|' + PATTERN_ACCIDENTAL_3_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')', ACCIDENTALS.threeQuarterFlat), _defineProperty(_ACCIDENTAL_PATTERNS, '(' + PATTERN_ACCIDENTAL_SHARP + '\\+|' + PATTERN_ACCIDENTAL_3_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')', ACCIDENTALS.threeQuarterSharp), _ACCIDENTAL_PATTERNS);
+var ACCIDENTAL_PATTERNS = (_ACCIDENTAL_PATTERNS = {}, _defineProperty(_ACCIDENTAL_PATTERNS, ACCIDENTALS.none, ''), _defineProperty(_ACCIDENTAL_PATTERNS, ACCIDENTALS.natural, '([♮n]|nat(ural)?)'), _defineProperty(_ACCIDENTAL_PATTERNS, ACCIDENTALS.flat, PATTERN_ACCIDENTAL_FLAT), _defineProperty(_ACCIDENTAL_PATTERNS, ACCIDENTALS.sharp, PATTERN_ACCIDENTAL_SHARP), _defineProperty(_ACCIDENTAL_PATTERNS, ACCIDENTALS.quarterFlat, '(d|-|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')'), _defineProperty(_ACCIDENTAL_PATTERNS, ACCIDENTALS.quarterSharp, '(\\+|' + PATTERN_ACCIDENTAL_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')'), _defineProperty(_ACCIDENTAL_PATTERNS, ACCIDENTALS.doubleFlat, '(𝄫|bb|double[ -]' + PATTERN_ACCIDENTAL_FLAT + ')'), _defineProperty(_ACCIDENTAL_PATTERNS, ACCIDENTALS.doubleSharp, '(𝄪|♯♯|##|double[ -]' + PATTERN_ACCIDENTAL_SHARP + ')'), _defineProperty(_ACCIDENTAL_PATTERNS, ACCIDENTALS.threeQuarterFlat, '(db|' + PATTERN_ACCIDENTAL_FLAT + '-|' + PATTERN_ACCIDENTAL_3_QUARTER + PATTERN_ACCIDENTAL_FLAT + ')'), _defineProperty(_ACCIDENTAL_PATTERNS, ACCIDENTALS.threeQuarterSharp, '(\\+\\+|' + PATTERN_ACCIDENTAL_SHARP + '\\+|' + PATTERN_ACCIDENTAL_3_QUARTER + PATTERN_ACCIDENTAL_SHARP + ')'), _ACCIDENTAL_PATTERNS);
 
 var normalizeAccidental = function normalizeAccidental(accidental) {
   accidental = accidental.trim();
 
-  for (var pattern in ACCIDENTAL_PATTERNS) {
-    var replacement = ACCIDENTAL_PATTERNS[pattern];
-    if (accidental === replacement || new RegExp('^' + pattern + '$', 'iu').test(accidental)) {
+  for (var replacement in ACCIDENTAL_PATTERNS) {
+    if (accidental === replacement || new RegExp('^' + ACCIDENTAL_PATTERNS[replacement] + '$', 'iu').test(accidental)) {
       return replacement;
     }
   }
 
-  throw new Error('Invalid accidental: ' + accidental);
+  throw new _errors.InvalidArgumentError('Invalid accidental: "' + accidental + '"');
 };
 
 var accidentalCents = (_accidentalCents = {}, _defineProperty(_accidentalCents, ACCIDENTALS.none, 0), _defineProperty(_accidentalCents, ACCIDENTALS.natural, 0), _defineProperty(_accidentalCents, ACCIDENTALS.flat, -100), _defineProperty(_accidentalCents, ACCIDENTALS.sharp, 100), _defineProperty(_accidentalCents, ACCIDENTALS.quarterFlat, -50), _defineProperty(_accidentalCents, ACCIDENTALS.quarterSharp, 50), _defineProperty(_accidentalCents, ACCIDENTALS.doubleFlat, -200), _defineProperty(_accidentalCents, ACCIDENTALS.doubleSharp, 200), _defineProperty(_accidentalCents, ACCIDENTALS.threeQuarterFlat, -150), _defineProperty(_accidentalCents, ACCIDENTALS.threeQuarterSharp, 150), _accidentalCents);
@@ -685,7 +733,7 @@ var Note = function () {
     _classCallCheck(this, Note);
 
     if (octave > 1000) {
-      throw new Error('Invalid octave: ' + octave);
+      throw new _errors.InvalidArgumentError('Invalid octave: ' + octave);
     }
 
     this.name = name;
@@ -753,7 +801,7 @@ var Note = function () {
         if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
       }
 
-      throw new Error('Failed to find note name for cents: ' + cents);
+      throw new _errors.RuntimeError('Failed to find note name for cents: ' + cents);
     }
   }, {
     key: 'fromFrequency',
@@ -779,30 +827,36 @@ var Note = function () {
       // Extract the note name (A-G).
       var matches = rest.match(PATTERN_NAME);
       if (matches === null) {
-        throw new Error('Invalid note name: ' + name);
+        throw new _errors.InvalidArgumentError('Invalid note: "' + name + '" (it should start with a letter, A-G)');
       }
       var noteName = matches[0].toUpperCase();
       rest = rest.replace(PATTERN_NAME, '').trim();
 
-      // Check for ambiguities.
-      // @todo this probably can be extended
-      matches = rest.match(/^([+-])[0-9]+$/);
-      if (matches !== null) {
-        throw new Error('Ambiguous note: ' + name + ' (is "' + matches[1] + '" an accidental?)');
-      }
+      var spacesPattern = / +/;
 
       // Extract the cents difference (e.g. +2c).
       matches = rest.match(PATTERN_DIFFERENCE);
       if (matches !== null) {
-        difference = matches[1];
+        difference = matches[1].replace(spacesPattern, '');
         rest = rest.replace(PATTERN_DIFFERENCE, '').trim();
       }
 
       // Extract the octave.
       matches = rest.match(PATTERN_OCTAVE);
       if (matches !== null) {
-        octave = parseInt(matches[1], 10);
+        octave = parseInt(matches[1].replace(spacesPattern, ''), 10);
         rest = rest.replace(PATTERN_OCTAVE, '').trim();
+      }
+
+      // The rest of the string (if any) is treated as the accidental.
+      accidental = rest || accidental;
+      try {
+        accidental = normalizeAccidental(accidental);
+      } catch (e) {
+        if (e instanceof _errors.InvalidArgumentError) {
+          throw new _errors.InvalidArgumentError('Invalid note: "' + name + '" (unrecognised: "' + accidental + '")');
+        }
+        throw e;
       }
 
       // Normalize the octave and cents difference.
@@ -811,9 +865,6 @@ var Note = function () {
         octave += diffOctave;
         difference -= diffOctave * 1200;
       }
-
-      // The rest of the string (if any) is treated as the accidental.
-      accidental = rest ? normalizeAccidental(rest) : normalizeAccidental(accidental);
 
       return new Note(noteName, accidental, octave, Math.toDecimalPlaces(difference, 2));
     }

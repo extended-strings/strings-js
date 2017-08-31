@@ -1,4 +1,5 @@
 import { Note } from './index';
+import { InvalidArgumentError } from './errors';
 
 export const presets = {
   'violin': {
@@ -36,7 +37,7 @@ export default class Instrument {
 
   static fromPreset(preset) {
     if (presets[preset] === undefined) {
-      throw new Error(`Preset not found: ${preset}`);
+      throw new InvalidArgumentError(`Preset not found: ${preset}`);
     }
 
     return this.fromNames(presets[preset].names, presets[preset].length);

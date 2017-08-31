@@ -1,10 +1,11 @@
 import Cents from './Cents';
 import Math from './Math';
+import { InvalidArgumentError } from './errors';
 
 export default class Harmonic {
   constructor(halfStop, baseStop, stringFrequency) {
     if (halfStop > baseStop) {
-      throw new Error('The half-stop cannot be lower than the base stop.');
+      throw new InvalidArgumentError('The half-stop cannot be lower than the base stop.');
     }
 
     this.halfStop = halfStop;
@@ -49,16 +50,6 @@ export default class Harmonic {
     }
 
     return harmonics;
-  }
-
-  static getSeries(limit) {
-    let series = [];
-    let base = 0;
-    for (let denominator = 1; denominator <= limit; denominator++) {
-      base = series[denominator] = base + 1 / denominator;
-    }
-
-    return series;
   }
 
 }

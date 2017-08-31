@@ -1,3 +1,5 @@
+import { InvalidArgumentError } from './errors';
+
 export default class Cents {
   static frequenciesToCents(lower, upper) {
     return Math.isEqual(lower, 0) ? 0 : 1200 * (Math.log(upper / lower) / Math.log(2));
@@ -17,7 +19,7 @@ export default class Cents {
 
   static frequencyToStringLength(frequency, stringFrequency) {
     if (Math.isEqual(frequency, 0)) {
-      throw new Error(`Invalid frequency: ${frequency}`);
+      throw new InvalidArgumentError(`Invalid (zero) frequency: ${frequency}`);
     }
     const centsOverString = this.frequenciesToCents(stringFrequency, frequency);
 
