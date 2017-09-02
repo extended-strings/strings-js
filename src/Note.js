@@ -15,7 +15,7 @@ export const ACCIDENTALS = {
 };
 
 const PATTERN_NAME = new RegExp('^ *[a-g]', 'i');
-const PATTERN_OCTAVE = new RegExp('[/ ]*([\-]? *[0-9]+)\\b');
+const PATTERN_OCTAVE = new RegExp('[/ ]*([\-]? *[0-9]+)');
 const PATTERN_DIFFERENCE = new RegExp('([+-]? *[0-9]+(\.[0-9]+)?) *(c(ent)?s?|¢)', 'iu');
 
 const PATTERN_ACCIDENTAL_SHARP = '([♯s#]|sh(arp)?)';
@@ -176,7 +176,7 @@ export default class Note {
   }
 
   toString() {
-    let output = this.name + this.accidental + '/' + this.octave;
+    let output = this.name + this.accidental + this.octave;
     if (!Math.isEqual(this.difference, 0)) {
       output += ' ' + (this.difference > 0 ? '+' : '') + this.difference + '¢';
     }

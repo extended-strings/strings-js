@@ -2,12 +2,12 @@ import Cents from './Cents';
 import Harmonic from './Harmonic';
 import Math from './Math';
 
-function getPhysicalDistanceBetweenStops(harmonic, instrument) {
-  return (harmonic.baseStop - harmonic.halfStop) * instrument.stringLength;
+function getPhysicalDistanceBetweenStops(harmonic, physicalStringLength) {
+  return (harmonic.baseStop - harmonic.halfStop) * physicalStringLength;
 }
 
-function getBowedDistance(harmonic, instrument) {
-  return harmonic.halfStop * instrument.stringLength;
+function getBowedDistance(harmonic, physicalStringLength) {
+  return harmonic.halfStop * physicalStringLength;
 }
 
 export default class HarmonicCalculator {
@@ -42,7 +42,7 @@ export default class HarmonicCalculator {
 
   findNaturalHarmonics(soundingNote, stringFrequency) {
     let harmonics = [];
-    for (let number = 1; number <= 8; number++) {
+    for (let number = 1; number <= 16; number++) {
       // Convert harmonic number to the sounding frequency.
       const candidateFrequency = Harmonic.getSoundingFrequency(1, 1 / number, stringFrequency);
 
@@ -60,28 +60,36 @@ export default class HarmonicCalculator {
     return harmonics;
   }
 
-  validatePhysicalDistance(harmonic, instrument) {
+  validatePhysicalDistance(harmonic, physicalStringLength) {
     if (!harmonic.isNatural) {
-      const distance = getPhysicalDistanceBetweenStops(harmonic, instrument);
+      const distance = getPhysicalDistanceBetweenStops(harmonic, physicalStringLength);
 
       if (distance < this.minStopDistance || distance > this.maxStopDistance) {
         return false;
       }
     }
 
-    return getBowedDistance(harmonic, instrument) >= this.minBowedDistance;
+    return getBowedDistance(harmonic, physicalStringLength) >= this.minBowedDistance;
   }
 
-  findHarmonics(soundingNote, instrument) {
+  findHarmonics(soundingNote, instrumentString) {
     let harmonics = [];
-    for (const stringFrequency of instrument.stringFrequencies) {
-      harmonics.push(
-        ...this.findNaturalHarmonics(soundingNote, stringFrequency),
-        ...this.findArtificialHarmonics(soundingNote, stringFrequency)
-      );
-    }
+    harmonics.push(
+      ...this.findNaturalHarmonics(soundingNote, instrumentString.frequency),
+      ...this.findArtificialHarmonics(soundingNote, instrumentString.frequency)
+    );
+    harmonics = harmonics.filter(
+      (harmonic) => this.validatePhysicalDistance(harmonic, instrumentString.physicalLength)
+    );
 
-    harmonics = harmonics.filter((harmonic) => this.validatePhysicalDistance(harmonic, instrument));
+    return harmonics;
+  }
+
+  findHarmonicsForInstrument(soundingNote, instrument) {
+    let harmonics = [];
+    for (let instrumentString of instrument.strings) {
+      harmonics.push(...this.findHarmonics(soundingNote, instrumentString));
+    }
 
     return harmonics;
   }

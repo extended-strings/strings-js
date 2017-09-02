@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 5);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -199,43 +199,6 @@ module.exports = exports['default'];
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.Note = exports.Instrument = exports.HarmonicCalculator = exports.Harmonic = undefined;
-
-var _Harmonic = __webpack_require__(3);
-
-var _Harmonic2 = _interopRequireDefault(_Harmonic);
-
-var _HarmonicCalculator = __webpack_require__(5);
-
-var _HarmonicCalculator2 = _interopRequireDefault(_HarmonicCalculator);
-
-var _Instrument = __webpack_require__(6);
-
-var _Instrument2 = _interopRequireDefault(_Instrument);
-
-var _Note = __webpack_require__(7);
-
-var _Note2 = _interopRequireDefault(_Note);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-_Note2.default.ACCIDENTALS = _Note.ACCIDENTALS;
-
-exports.Harmonic = _Harmonic2.default;
-exports.HarmonicCalculator = _HarmonicCalculator2.default;
-exports.Instrument = _Instrument2.default;
-exports.Note = _Note2.default;
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -243,7 +206,7 @@ var _Cents = __webpack_require__(1);
 
 var _Cents2 = _interopRequireDefault(_Cents);
 
-var _Math = __webpack_require__(4);
+var _Math = __webpack_require__(3);
 
 var _Math2 = _interopRequireDefault(_Math);
 
@@ -322,7 +285,7 @@ exports.default = Harmonic;
 module.exports = exports['default'];
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -331,7 +294,7 @@ module.exports = exports['default'];
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-var EPSILON = Math.pow(2, -32);
+var EPSILON = 0.0000000001;
 
 Math.isEqual = function (a, b) {
   return Math.abs(a - b) < EPSILON;
@@ -366,284 +329,7 @@ exports.default = Math;
 module.exports = exports["default"];
 
 /***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _Cents = __webpack_require__(1);
-
-var _Cents2 = _interopRequireDefault(_Cents);
-
-var _Harmonic = __webpack_require__(3);
-
-var _Harmonic2 = _interopRequireDefault(_Harmonic);
-
-var _Math = __webpack_require__(4);
-
-var _Math2 = _interopRequireDefault(_Math);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function getPhysicalDistanceBetweenStops(harmonic, instrument) {
-  return (harmonic.baseStop - harmonic.halfStop) * instrument.stringLength;
-}
-
-function getBowedDistance(harmonic, instrument) {
-  return harmonic.halfStop * instrument.stringLength;
-}
-
-var HarmonicCalculator = function () {
-  function HarmonicCalculator() {
-    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
-        _ref$minStopDistance = _ref.minStopDistance,
-        minStopDistance = _ref$minStopDistance === undefined ? 1 : _ref$minStopDistance,
-        _ref$maxStopDistance = _ref.maxStopDistance,
-        maxStopDistance = _ref$maxStopDistance === undefined ? 120 : _ref$maxStopDistance,
-        _ref$minBowedDistance = _ref.minBowedDistance,
-        minBowedDistance = _ref$minBowedDistance === undefined ? 20 : _ref$minBowedDistance,
-        _ref$maxSoundingNoteD = _ref.maxSoundingNoteDifference,
-        maxSoundingNoteDifference = _ref$maxSoundingNoteD === undefined ? 50 : _ref$maxSoundingNoteD;
-
-    _classCallCheck(this, HarmonicCalculator);
-
-    this.minStopDistance = minStopDistance;
-    this.maxStopDistance = maxStopDistance;
-    this.minBowedDistance = minBowedDistance;
-    this.maxSoundingNoteDifference = maxSoundingNoteDifference;
-  }
-
-  _createClass(HarmonicCalculator, [{
-    key: 'findArtificialHarmonics',
-    value: function findArtificialHarmonics(soundingNote, stringFrequency) {
-      var harmonics = [];
-      var soundingNoteFrequency = soundingNote.getFrequency();
-      for (var number = 2; number <= 6; number++) {
-        var fundamental = soundingNoteFrequency / number;
-        if (_Math2.default.isGreaterThan(fundamental, stringFrequency)) {
-          var baseStop = _Cents2.default.frequencyToStringLength(fundamental, stringFrequency),
-              halfStop = (number - 1) / number * baseStop;
-
-          harmonics.push(new _Harmonic2.default(halfStop, baseStop, stringFrequency));
-        }
-      }
-
-      return harmonics;
-    }
-  }, {
-    key: 'findNaturalHarmonics',
-    value: function findNaturalHarmonics(soundingNote, stringFrequency) {
-      var harmonics = [];
-      for (var number = 1; number <= 8; number++) {
-        // Convert harmonic number to the sounding frequency.
-        var candidateFrequency = _Harmonic2.default.getSoundingFrequency(1, 1 / number, stringFrequency);
-
-        // Calculate the difference in cents between the natural harmonic
-        // frequency and the desired sounding note.
-        var difference = _Math2.default.abs(_Cents2.default.frequencyToCents(candidateFrequency) - soundingNote.cents);
-
-        if (difference <= this.maxSoundingNoteDifference) {
-          var _iteratorNormalCompletion = true;
-          var _didIteratorError = false;
-          var _iteratorError = undefined;
-
-          try {
-            for (var _iterator = _Harmonic2.default.getStringLengthsFromNumber(number, true)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-              var stringLength = _step.value;
-
-              harmonics.push(new _Harmonic2.default(stringLength, 1, stringFrequency));
-            }
-          } catch (err) {
-            _didIteratorError = true;
-            _iteratorError = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion && _iterator.return) {
-                _iterator.return();
-              }
-            } finally {
-              if (_didIteratorError) {
-                throw _iteratorError;
-              }
-            }
-          }
-        }
-      }
-
-      return harmonics;
-    }
-  }, {
-    key: 'validatePhysicalDistance',
-    value: function validatePhysicalDistance(harmonic, instrument) {
-      if (!harmonic.isNatural) {
-        var distance = getPhysicalDistanceBetweenStops(harmonic, instrument);
-
-        if (distance < this.minStopDistance || distance > this.maxStopDistance) {
-          return false;
-        }
-      }
-
-      return getBowedDistance(harmonic, instrument) >= this.minBowedDistance;
-    }
-  }, {
-    key: 'findHarmonics',
-    value: function findHarmonics(soundingNote, instrument) {
-      var _this = this;
-
-      var harmonics = [];
-      var _iteratorNormalCompletion2 = true;
-      var _didIteratorError2 = false;
-      var _iteratorError2 = undefined;
-
-      try {
-        for (var _iterator2 = instrument.stringFrequencies[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-          var _harmonics;
-
-          var stringFrequency = _step2.value;
-
-          (_harmonics = harmonics).push.apply(_harmonics, _toConsumableArray(this.findNaturalHarmonics(soundingNote, stringFrequency)).concat(_toConsumableArray(this.findArtificialHarmonics(soundingNote, stringFrequency))));
-        }
-      } catch (err) {
-        _didIteratorError2 = true;
-        _iteratorError2 = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion2 && _iterator2.return) {
-            _iterator2.return();
-          }
-        } finally {
-          if (_didIteratorError2) {
-            throw _iteratorError2;
-          }
-        }
-      }
-
-      harmonics = harmonics.filter(function (harmonic) {
-        return _this.validatePhysicalDistance(harmonic, instrument);
-      });
-
-      return harmonics;
-    }
-  }]);
-
-  return HarmonicCalculator;
-}();
-
-exports.default = HarmonicCalculator;
-module.exports = exports['default'];
-
-/***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.presets = undefined;
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-var _index = __webpack_require__(2);
-
-var _errors = __webpack_require__(0);
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var presets = exports.presets = {
-  'violin': {
-    'names': ['E5', 'A4', 'D4', 'G3'],
-    'length': 325
-  },
-  'viola': {
-    'names': ['A4', 'D4', 'G3', 'C3'],
-    'length': 410
-  },
-  'cello': {
-    'names': ['A3', 'D3', 'G2', 'C2'],
-    'length': 690
-  },
-  'double bass': {
-    'names': ['G2', 'D2', 'A1', 'E1'],
-    'length': 1140
-  }
-};
-
-var Instrument = function () {
-  function Instrument() {
-    var stringFrequencies = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
-    var stringLength = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 500;
-
-    _classCallCheck(this, Instrument);
-
-    this.stringFrequencies = stringFrequencies;
-    this.stringLength = stringLength;
-  }
-
-  _createClass(Instrument, null, [{
-    key: 'fromNames',
-    value: function fromNames(stringNames) {
-      var length = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 500;
-
-      var strings = [];
-      var _iteratorNormalCompletion = true;
-      var _didIteratorError = false;
-      var _iteratorError = undefined;
-
-      try {
-        for (var _iterator = stringNames[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-          var name = _step.value;
-
-          strings.push(_index.Note.fromName(name).getFrequency());
-        }
-      } catch (err) {
-        _didIteratorError = true;
-        _iteratorError = err;
-      } finally {
-        try {
-          if (!_iteratorNormalCompletion && _iterator.return) {
-            _iterator.return();
-          }
-        } finally {
-          if (_didIteratorError) {
-            throw _iteratorError;
-          }
-        }
-      }
-
-      return new this(strings, length);
-    }
-  }, {
-    key: 'fromPreset',
-    value: function fromPreset(preset) {
-      if (presets[preset] === undefined) {
-        throw new _errors.InvalidArgumentError('Preset not found: ' + preset);
-      }
-
-      return this.fromNames(presets[preset].names, presets[preset].length);
-    }
-  }]);
-
-  return Instrument;
-}();
-
-exports.default = Instrument;
-
-/***/ }),
-/* 7 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -688,7 +374,7 @@ var ACCIDENTALS = exports.ACCIDENTALS = {
 };
 
 var PATTERN_NAME = new RegExp('^ *[a-g]', 'i');
-var PATTERN_OCTAVE = new RegExp('[/ ]*([\-]? *[0-9]+)\\b');
+var PATTERN_OCTAVE = new RegExp('[/ ]*([\-]? *[0-9]+)');
 var PATTERN_DIFFERENCE = new RegExp('([+-]? *[0-9]+(\.[0-9]+)?) *(c(ent)?s?|¢)', 'iu');
 
 var PATTERN_ACCIDENTAL_SHARP = '([♯s#]|sh(arp)?)';
@@ -745,7 +431,7 @@ var Note = function () {
   _createClass(Note, [{
     key: 'toString',
     value: function toString() {
-      var output = this.name + this.accidental + '/' + this.octave;
+      var output = this.name + this.accidental + this.octave;
       if (!Math.isEqual(this.difference, 0)) {
         output += ' ' + (this.difference > 0 ? '+' : '') + this.difference + '¢';
       }
@@ -874,6 +560,407 @@ var Note = function () {
 }();
 
 exports.default = Note;
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.Note = exports.InstrumentString = exports.Instrument = exports.HarmonicCalculator = exports.Harmonic = undefined;
+
+var _Harmonic = __webpack_require__(2);
+
+var _Harmonic2 = _interopRequireDefault(_Harmonic);
+
+var _HarmonicCalculator = __webpack_require__(6);
+
+var _HarmonicCalculator2 = _interopRequireDefault(_HarmonicCalculator);
+
+var _Instrument = __webpack_require__(7);
+
+var _Instrument2 = _interopRequireDefault(_Instrument);
+
+var _InstrumentString = __webpack_require__(8);
+
+var _InstrumentString2 = _interopRequireDefault(_InstrumentString);
+
+var _Note = __webpack_require__(4);
+
+var _Note2 = _interopRequireDefault(_Note);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+_Note2.default.ACCIDENTALS = _Note.ACCIDENTALS;
+
+exports.Harmonic = _Harmonic2.default;
+exports.HarmonicCalculator = _HarmonicCalculator2.default;
+exports.Instrument = _Instrument2.default;
+exports.InstrumentString = _InstrumentString2.default;
+exports.Note = _Note2.default;
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Cents = __webpack_require__(1);
+
+var _Cents2 = _interopRequireDefault(_Cents);
+
+var _Harmonic = __webpack_require__(2);
+
+var _Harmonic2 = _interopRequireDefault(_Harmonic);
+
+var _Math = __webpack_require__(3);
+
+var _Math2 = _interopRequireDefault(_Math);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function getPhysicalDistanceBetweenStops(harmonic, physicalStringLength) {
+  return (harmonic.baseStop - harmonic.halfStop) * physicalStringLength;
+}
+
+function getBowedDistance(harmonic, physicalStringLength) {
+  return harmonic.halfStop * physicalStringLength;
+}
+
+var HarmonicCalculator = function () {
+  function HarmonicCalculator() {
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        _ref$minStopDistance = _ref.minStopDistance,
+        minStopDistance = _ref$minStopDistance === undefined ? 1 : _ref$minStopDistance,
+        _ref$maxStopDistance = _ref.maxStopDistance,
+        maxStopDistance = _ref$maxStopDistance === undefined ? 120 : _ref$maxStopDistance,
+        _ref$minBowedDistance = _ref.minBowedDistance,
+        minBowedDistance = _ref$minBowedDistance === undefined ? 20 : _ref$minBowedDistance,
+        _ref$maxSoundingNoteD = _ref.maxSoundingNoteDifference,
+        maxSoundingNoteDifference = _ref$maxSoundingNoteD === undefined ? 50 : _ref$maxSoundingNoteD;
+
+    _classCallCheck(this, HarmonicCalculator);
+
+    this.minStopDistance = minStopDistance;
+    this.maxStopDistance = maxStopDistance;
+    this.minBowedDistance = minBowedDistance;
+    this.maxSoundingNoteDifference = maxSoundingNoteDifference;
+  }
+
+  _createClass(HarmonicCalculator, [{
+    key: 'findArtificialHarmonics',
+    value: function findArtificialHarmonics(soundingNote, stringFrequency) {
+      var harmonics = [];
+      var soundingNoteFrequency = soundingNote.getFrequency();
+      for (var number = 2; number <= 6; number++) {
+        var fundamental = soundingNoteFrequency / number;
+        if (_Math2.default.isGreaterThan(fundamental, stringFrequency)) {
+          var baseStop = _Cents2.default.frequencyToStringLength(fundamental, stringFrequency),
+              halfStop = (number - 1) / number * baseStop;
+
+          harmonics.push(new _Harmonic2.default(halfStop, baseStop, stringFrequency));
+        }
+      }
+
+      return harmonics;
+    }
+  }, {
+    key: 'findNaturalHarmonics',
+    value: function findNaturalHarmonics(soundingNote, stringFrequency) {
+      var harmonics = [];
+      for (var number = 1; number <= 16; number++) {
+        // Convert harmonic number to the sounding frequency.
+        var candidateFrequency = _Harmonic2.default.getSoundingFrequency(1, 1 / number, stringFrequency);
+
+        // Calculate the difference in cents between the natural harmonic
+        // frequency and the desired sounding note.
+        var difference = _Math2.default.abs(_Cents2.default.frequencyToCents(candidateFrequency) - soundingNote.cents);
+
+        if (difference <= this.maxSoundingNoteDifference) {
+          var _iteratorNormalCompletion = true;
+          var _didIteratorError = false;
+          var _iteratorError = undefined;
+
+          try {
+            for (var _iterator = _Harmonic2.default.getStringLengthsFromNumber(number, true)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+              var stringLength = _step.value;
+
+              harmonics.push(new _Harmonic2.default(stringLength, 1, stringFrequency));
+            }
+          } catch (err) {
+            _didIteratorError = true;
+            _iteratorError = err;
+          } finally {
+            try {
+              if (!_iteratorNormalCompletion && _iterator.return) {
+                _iterator.return();
+              }
+            } finally {
+              if (_didIteratorError) {
+                throw _iteratorError;
+              }
+            }
+          }
+        }
+      }
+
+      return harmonics;
+    }
+  }, {
+    key: 'validatePhysicalDistance',
+    value: function validatePhysicalDistance(harmonic, physicalStringLength) {
+      if (!harmonic.isNatural) {
+        var distance = getPhysicalDistanceBetweenStops(harmonic, physicalStringLength);
+
+        if (distance < this.minStopDistance || distance > this.maxStopDistance) {
+          return false;
+        }
+      }
+
+      return getBowedDistance(harmonic, physicalStringLength) >= this.minBowedDistance;
+    }
+  }, {
+    key: 'findHarmonics',
+    value: function findHarmonics(soundingNote, instrumentString) {
+      var _harmonics,
+          _this = this;
+
+      var harmonics = [];
+      (_harmonics = harmonics).push.apply(_harmonics, _toConsumableArray(this.findNaturalHarmonics(soundingNote, instrumentString.frequency)).concat(_toConsumableArray(this.findArtificialHarmonics(soundingNote, instrumentString.frequency))));
+      harmonics = harmonics.filter(function (harmonic) {
+        return _this.validatePhysicalDistance(harmonic, instrumentString.physicalLength);
+      });
+
+      return harmonics;
+    }
+  }, {
+    key: 'findHarmonicsForInstrument',
+    value: function findHarmonicsForInstrument(soundingNote, instrument) {
+      var harmonics = [];
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = instrument.strings[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var instrumentString = _step2.value;
+
+          harmonics.push.apply(harmonics, _toConsumableArray(this.findHarmonics(soundingNote, instrumentString)));
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+
+      return harmonics;
+    }
+  }]);
+
+  return HarmonicCalculator;
+}();
+
+exports.default = HarmonicCalculator;
+module.exports = exports['default'];
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.presets = undefined;
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _Note = __webpack_require__(4);
+
+var _Note2 = _interopRequireDefault(_Note);
+
+var _errors = __webpack_require__(0);
+
+var _InstrumentString = __webpack_require__(8);
+
+var _InstrumentString2 = _interopRequireDefault(_InstrumentString);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var presets = exports.presets = {
+  'violin': {
+    'names': ['E5', 'A4', 'D4', 'G3'],
+    'length': 325,
+    'clef': 'treble'
+  },
+  'viola': {
+    'names': ['A4', 'D4', 'G3', 'C3'],
+    'length': 410,
+    'clef': 'alto'
+  },
+  'cello': {
+    'names': ['A3', 'D3', 'G2', 'C2'],
+    'length': 690,
+    'clef': 'bass'
+  },
+  'double bass': {
+    'names': ['G2', 'D2', 'A1', 'E1'],
+    'length': 1140,
+    'clef': 'bass'
+  }
+};
+
+var Instrument = function () {
+  function Instrument() {
+    var stringFrequencies = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : [];
+    var stringLength = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 500;
+    var clef = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'treble';
+
+    _classCallCheck(this, Instrument);
+
+    var stringNames = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'];
+    this.strings = [];
+    for (var index in stringFrequencies) {
+      this.strings.push(new _InstrumentString2.default(stringNames[index], stringFrequencies[index], stringLength));
+    }
+    this.clef = clef;
+  }
+
+  _createClass(Instrument, [{
+    key: 'getString',
+    value: function getString(number) {
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = this.strings[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var string = _step.value;
+
+          if (string.number === number) {
+            return string;
+          }
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
+      throw new _errors.InvalidArgumentError('String not found: ' + number);
+    }
+  }], [{
+    key: 'fromNames',
+    value: function fromNames(stringNames) {
+      var length = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 500;
+      var clef = arguments[2];
+
+      var strings = [];
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = stringNames[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var name = _step2.value;
+
+          strings.push(_Note2.default.fromName(name).getFrequency());
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+
+      return new this(strings, length, clef);
+    }
+  }, {
+    key: 'fromPreset',
+    value: function fromPreset(preset) {
+      if (presets[preset] === undefined) {
+        throw new _errors.InvalidArgumentError('Preset not found: ' + preset);
+      }
+
+      return this.fromNames(presets[preset].names, presets[preset].length, presets[preset].clef);
+    }
+  }]);
+
+  return Instrument;
+}();
+
+exports.default = Instrument;
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var InstrumentString = function InstrumentString(stringNumber, frequency) {
+  var physicalLength = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 500;
+
+  _classCallCheck(this, InstrumentString);
+
+  this.number = stringNumber;
+  this.frequency = frequency;
+  this.physicalLength = physicalLength;
+};
+
+exports.default = InstrumentString;
+module.exports = exports["default"];
 
 /***/ })
 /******/ ]);

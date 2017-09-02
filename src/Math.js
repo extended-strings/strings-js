@@ -1,4 +1,4 @@
-const EPSILON = Math.pow(2, -32);
+const EPSILON = 0.0000000001;
 
 Math.isEqual = function (a, b) {
   return Math.abs(a - b) < EPSILON;
