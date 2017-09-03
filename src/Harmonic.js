@@ -43,7 +43,7 @@ export default class Harmonic {
 
   static getStringLengthsFromNumber(number, exclusive = false) {
     let harmonics = [];
-    for (let numerator = 1; numerator <= number; numerator++) {
+    for (let numerator = number; numerator >= 1; numerator--) {
       if (!exclusive || numerator === 1 || Math.isEqual(Math.gcd(numerator, number), 1)) {
         harmonics.push(numerator / number);
       }

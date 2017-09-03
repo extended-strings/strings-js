@@ -70,7 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 5);
+/******/ 	return __webpack_require__(__webpack_require__.s = 6);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -268,7 +268,7 @@ var Harmonic = function () {
       var exclusive = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
 
       var harmonics = [];
-      for (var numerator = 1; numerator <= number; numerator++) {
+      for (var numerator = number; numerator >= 1; numerator--) {
         if (!exclusive || numerator === 1 || _Math2.default.isEqual(_Math2.default.gcd(numerator, number), 1)) {
           harmonics.push(numerator / number);
         }
@@ -571,21 +571,47 @@ exports.default = Note;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var InstrumentString = function InstrumentString(stringNumber, frequency) {
+  var physicalLength = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 500;
+
+  _classCallCheck(this, InstrumentString);
+
+  this.number = stringNumber;
+  this.frequency = frequency;
+  this.physicalLength = physicalLength;
+};
+
+exports.default = InstrumentString;
+module.exports = exports["default"];
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.Note = exports.InstrumentString = exports.Instrument = exports.HarmonicCalculator = exports.Harmonic = undefined;
 
 var _Harmonic = __webpack_require__(2);
 
 var _Harmonic2 = _interopRequireDefault(_Harmonic);
 
-var _HarmonicCalculator = __webpack_require__(6);
+var _HarmonicCalculator = __webpack_require__(7);
 
 var _HarmonicCalculator2 = _interopRequireDefault(_HarmonicCalculator);
 
-var _Instrument = __webpack_require__(7);
+var _Instrument = __webpack_require__(8);
 
 var _Instrument2 = _interopRequireDefault(_Instrument);
 
-var _InstrumentString = __webpack_require__(8);
+var _InstrumentString = __webpack_require__(5);
 
 var _InstrumentString2 = _interopRequireDefault(_InstrumentString);
 
@@ -604,7 +630,7 @@ exports.InstrumentString = _InstrumentString2.default;
 exports.Note = _Note2.default;
 
 /***/ }),
-/* 6 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -667,7 +693,7 @@ var HarmonicCalculator = function () {
     value: function findArtificialHarmonics(soundingNote, stringFrequency) {
       var harmonics = [];
       var soundingNoteFrequency = soundingNote.getFrequency();
-      for (var number = 2; number <= 6; number++) {
+      for (var number = 6; number >= 2; number--) {
         var fundamental = soundingNoteFrequency / number;
         if (_Math2.default.isGreaterThan(fundamental, stringFrequency)) {
           var baseStop = _Cents2.default.frequencyToStringLength(fundamental, stringFrequency),
@@ -788,7 +814,7 @@ exports.default = HarmonicCalculator;
 module.exports = exports['default'];
 
 /***/ }),
-/* 7 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -807,7 +833,7 @@ var _Note2 = _interopRequireDefault(_Note);
 
 var _errors = __webpack_require__(0);
 
-var _InstrumentString = __webpack_require__(8);
+var _InstrumentString = __webpack_require__(5);
 
 var _InstrumentString2 = _interopRequireDefault(_InstrumentString);
 
@@ -935,32 +961,6 @@ var Instrument = function () {
 }();
 
 exports.default = Instrument;
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var InstrumentString = function InstrumentString(stringNumber, frequency) {
-  var physicalLength = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 500;
-
-  _classCallCheck(this, InstrumentString);
-
-  this.number = stringNumber;
-  this.frequency = frequency;
-  this.physicalLength = physicalLength;
-};
-
-exports.default = InstrumentString;
-module.exports = exports["default"];
 
 /***/ })
 /******/ ]);
