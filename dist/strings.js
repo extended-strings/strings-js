@@ -708,39 +708,45 @@ var HarmonicCalculator = function () {
   }, {
     key: 'findNaturalHarmonics',
     value: function findNaturalHarmonics(soundingNote, stringFrequency) {
+      var _this = this;
+
       var harmonics = [];
       for (var number = 1; number <= 16; number++) {
-        // Convert harmonic number to the sounding frequency.
-        var candidateFrequency = _Harmonic2.default.getSoundingFrequency(1, 1 / number, stringFrequency);
+        var harmonicsForNumber = this.findNaturalHarmonicsForNumber(number, stringFrequency);
+        harmonics.push.apply(harmonics, _toConsumableArray(harmonicsForNumber.filter(function (harmonic) {
+          var difference = _Math2.default.abs(_Cents2.default.frequencyToCents(harmonic.frequency) - soundingNote.cents);
 
-        // Calculate the difference in cents between the natural harmonic
-        // frequency and the desired sounding note.
-        var difference = _Math2.default.abs(_Cents2.default.frequencyToCents(candidateFrequency) - soundingNote.cents);
+          return difference <= _this.maxSoundingNoteDifference;
+        })));
+      }
 
-        if (difference <= this.maxSoundingNoteDifference) {
-          var _iteratorNormalCompletion = true;
-          var _didIteratorError = false;
-          var _iteratorError = undefined;
+      return harmonics;
+    }
+  }, {
+    key: 'findNaturalHarmonicsForNumber',
+    value: function findNaturalHarmonicsForNumber(number, stringFrequency) {
+      var harmonics = [];
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
 
-          try {
-            for (var _iterator = _Harmonic2.default.getStringLengthsFromNumber(number, true)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
-              var stringLength = _step.value;
+      try {
+        for (var _iterator = _Harmonic2.default.getStringLengthsFromNumber(number, true)[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var stringLength = _step.value;
 
-              harmonics.push(new _Harmonic2.default(stringLength, 1, stringFrequency));
-            }
-          } catch (err) {
-            _didIteratorError = true;
-            _iteratorError = err;
-          } finally {
-            try {
-              if (!_iteratorNormalCompletion && _iterator.return) {
-                _iterator.return();
-              }
-            } finally {
-              if (_didIteratorError) {
-                throw _iteratorError;
-              }
-            }
+          harmonics.push(new _Harmonic2.default(stringLength, 1, stringFrequency));
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator.return) {
+            _iterator.return();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
           }
         }
       }
@@ -764,12 +770,12 @@ var HarmonicCalculator = function () {
     key: 'findHarmonics',
     value: function findHarmonics(soundingNote, instrumentString) {
       var _harmonics,
-          _this = this;
+          _this2 = this;
 
       var harmonics = [];
       (_harmonics = harmonics).push.apply(_harmonics, _toConsumableArray(this.findNaturalHarmonics(soundingNote, instrumentString.frequency)).concat(_toConsumableArray(this.findArtificialHarmonics(soundingNote, instrumentString.frequency))));
       harmonics = harmonics.filter(function (harmonic) {
-        return _this.validatePhysicalDistance(harmonic, instrumentString.physicalLength);
+        return _this2.validatePhysicalDistance(harmonic, instrumentString.physicalLength);
       });
 
       return harmonics;
@@ -860,6 +866,11 @@ var presets = exports.presets = {
   'double bass': {
     'names': ['G2', 'D2', 'A1', 'E1'],
     'length': 1140,
+    'clef': 'bass'
+  },
+  'guitar': {
+    'names': ['E4', 'B3', 'G3', 'D3', 'A2', 'E2'],
+    'length': 650,
     'clef': 'bass'
   }
 };

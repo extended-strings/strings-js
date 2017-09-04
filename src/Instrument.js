@@ -22,6 +22,11 @@ export const presets = {
     'names': ['G2', 'D2', 'A1', 'E1'],
     'length': 1140,
     'clef': 'bass'
+  },
+  'guitar': {
+    'names': ['E4', 'B3', 'G3', 'D3', 'A2', 'E2'],
+    'length': 650,
+    'clef': 'bass'
   }
 };
 

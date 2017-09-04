@@ -43,18 +43,21 @@ export default class HarmonicCalculator {
   findNaturalHarmonics(soundingNote, stringFrequency) {
     let harmonics = [];
     for (let number = 1; number <= 16; number++) {
-      // Convert harmonic number to the sounding frequency.
-      const candidateFrequency = Harmonic.getSoundingFrequency(1, 1 / number, stringFrequency);
+      let harmonicsForNumber = this.findNaturalHarmonicsForNumber(number, stringFrequency);
+      harmonics.push(...harmonicsForNumber.filter(harmonic => {
+        const difference = Math.abs(Cents.frequencyToCents(harmonic.frequency) - soundingNote.cents);
 
-      // Calculate the difference in cents between the natural harmonic
-      // frequency and the desired sounding note.
-      const difference = Math.abs(Cents.frequencyToCents(candidateFrequency) - soundingNote.cents);
+        return difference <= this.maxSoundingNoteDifference;
+      }));
+    }
 
-      if (difference <= this.maxSoundingNoteDifference) {
-        for (const stringLength of Harmonic.getStringLengthsFromNumber(number, true)) {
-          harmonics.push(new Harmonic(stringLength, 1, stringFrequency));
-        }
-      }
+    return harmonics;
+  }
+
+  findNaturalHarmonicsForNumber(number, stringFrequency) {
+    let harmonics = [];
+    for (const stringLength of Harmonic.getStringLengthsFromNumber(number, true)) {
+      harmonics.push(new Harmonic(stringLength, 1, stringFrequency));
     }
 
     return harmonics;
